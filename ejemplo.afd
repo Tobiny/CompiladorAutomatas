@@ -1,17 +1,18 @@
 1: int seed  ; 
 2: str seed ; 
-4: boolean if ; 
-5: int228 dd ; 
-6: str 1uno ; 
-9: "letrero"
-10: boolean  >  ; 
-11: int 53 ; 
-12: int a ; 
-13: cad ; 
-18: str paubonita ; 
-19: INT a ; 
-20: a ; 
-21: boolean bandera ; 
-22: int v@r ; 
-25: a int ; 
-29: int a3 ; 
+3: str comidaGratis ; 
+7: boolean if ; 
+8: int228 dd ; 
+9: str 1uno ; 
+12: "letrero"
+13: boolean  >  ; 
+14: int 53 ; 
+15: int a ; 
+16: cad ; 
+21: str paubonita ; 
+22: INT a ; 
+23: a ; 
+24: boolean bandera ; 
+25: int v@r ; 
+28: a int ; 
+32: int a3 ; 

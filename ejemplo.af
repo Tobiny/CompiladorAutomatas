@@ -1,5 +1,6 @@
     int seed     ;
     str seed;
+    str comidaGratis;
 #Soy un comentario
    #Yo tambien
    # y yo a lo mejor
