@@ -1,5 +1,5 @@
 import re
-variables = re.compile(r'([a-zA-Z])\w+')
+variables = re.compile(r'^[a-zA-Z]+$')
 tabsim = [[],[],[],[]]
 
 palabras = ['main','int','boolean','str','readin','print','for', 'if', 'while']

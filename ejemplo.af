@@ -6,12 +6,15 @@
    "letrero"
    boolean >;
    int 53;
+   int a;
    cad;
    str paubonita;
    INT a;
    a;
    boolean bandera;
    int v@r;
+
+
    a int;
 
 #borrarlo

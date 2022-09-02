@@ -6,11 +6,12 @@
 6: "letrero"
 7: boolean  >  ; 
 8: int 53 ; 
-9: cad ; 
-10: str paubonita ; 
-11: INT a ; 
-12: a ; 
-13: boolean bandera ; 
-14: int v@r ; 
-15: a int ; 
-19: int a3 ; 
+9: int a ; 
+10: cad ; 
+11: str paubonita ; 
+12: INT a ; 
+13: a ; 
+14: boolean bandera ; 
+15: int v@r ; 
+18: a int ; 
+22: int a3 ; 
