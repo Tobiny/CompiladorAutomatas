@@ -1,27 +1,24 @@
-    hola                     =                                       7
-    int              main(                         ) {
-    float               a;
-d                     a                t                    o
+    int seed                 ;
+    str seed;
+    boolean if;
+   int228 dd;
+   str 1uno;
+   "letrero"
+   boolean >;
+   int 53;
+   cad;
+   str paubonita;
+   INT a;
+   a;
+   boolean bandera;
+   int v@r;
+   a int;
+
 #borrarlo
  #Este es un comentario
-    int a
-    a = 1.1;
-    i = 0;
-    inc                = 2;
-    read j;
+    int a3;
+
 /* Este tambien
 
 
 */
-    while (i <     j)
-
-    {
-        i = i                + inc;
-        a = a*i;
-    }
-
-                  if (a                   > 10.0)
-   {
-        print(a       +      i);
-    }
-}

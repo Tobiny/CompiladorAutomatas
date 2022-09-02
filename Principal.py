@@ -8,7 +8,7 @@ if __name__ == '__main__':
     Buffer = Buffer()
     Analyzer = LexicalAnalyzer()
 
-    Debugger.debugger('ejemplo.af', True)
+    Debugger.debugger('ejemplo.af')
 
     f = open('ejemplo.afn', 'w')
     f.write('TIPO,LEXEMA,FILA,COLUMNA\n')

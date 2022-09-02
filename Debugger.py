@@ -1,7 +1,7 @@
 import re
 
 
-def debugger(filename, withdict):
+def debugger(filename):
     source_dict = {}
     source = ''
     f = open(filename, "r")
@@ -11,9 +11,10 @@ def debugger(filename, withdict):
         pattern = r"(\".*?\"|\'.*?\')|(/\*.*?\*/|#[^\r\n]*$)"
         # primer grupo del patrón captura strings en comillas (dobles o simples)
         # segundo grupo captura comentarios (#una sola linea o /* multilineas*/
-        regex = re.compile(pattern, re.MULTILINE | re.DOTALL) # compilamos la expresion
-                                                              # regular retornando
-                                                              # un patron en forma de obj.
+        regex = re.compile(pattern, re.MULTILINE | re.DOTALL)  # compilamos la expresion
+
+        # regular retornando
+        # un patron en forma de obj.
 
         def _replacer(match):
             # si el segundo grupo es no None
@@ -36,9 +37,20 @@ def debugger(filename, withdict):
     dict_source = {}
     count = 1
 
+
     for line in source.split("\n"):
         dict_source[count] = line.lstrip(' ')
         dict_source[count] = " ".join(dict_source[count].split())
+        dict_source[count] = dict_source[count].replace('(', ' ( ')
+        dict_source[count] = dict_source[count].replace(')', ' ) ')
+        dict_source[count] = dict_source[count].replace('<', ' < ')
+        dict_source[count] = dict_source[count].replace('>', ' > ')
+        dict_source[count] = dict_source[count].replace('=', ' = ')
+        dict_source[count] = dict_source[count].replace('+', ' + ')
+        dict_source[count] = dict_source[count].replace('-', ' - ')
+        dict_source[count] = dict_source[count].replace('*', ' * ')
+        dict_source[count] = dict_source[count].replace(';', ' ; ')
+
         count += 1
         # Quitar espacios entre lineas como
         # 2   hola     ejemplo
@@ -46,14 +58,16 @@ def debugger(filename, withdict):
 
     dict_source = remove_lines(dict_source)
     string_out = ''
-    for k in dict_source:
-        string_out += str(k) + ': ' + dict_source[k] + '\n'
-        print(k, ' ', dict_source[k])
+    count = 0 #Contador para añadir saltos de linea
 
-    if withdict:
-        string_out = ''
-        for k in dict_source:
-            string_out += dict_source[k] + '\n'
+    for k in dict_source:
+
+        if count != 0:
+            string_out +='\n'+ str(k) + ': ' + dict_source[k]
+        else:
+            count = 1
+            string_out += str(k) + ': ' + dict_source[k]
+
     f = open(filename + 'd', 'w')
     f.write(string_out)
     f.close()
