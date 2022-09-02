@@ -1,13 +1,22 @@
-    int seed                 ;
+    int seed     ;
     str seed;
+#Soy un comentario
+   #Yo tambien
+   # y yo a lo mejor
     boolean if;
    int228 dd;
    str 1uno;
+
+
    "letrero"
    boolean >;
    int 53;
    int a;
    cad;
+
+
+
+
    str paubonita;
    INT a;
    a;
@@ -21,7 +30,3 @@
  #Este es un comentario
     int a3;
 
-/* Este tambien
-
-
-*/
