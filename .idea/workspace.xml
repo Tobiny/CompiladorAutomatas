@@ -341,7 +341,10 @@
       <workItem from="1653398526751" duration="13137000" />
       <workItem from="1661885006135" duration="8119000" />
       <workItem from="1661966393406" duration="453000" />
-      <workItem from="1662065592780" duration="12023000" />
+      <workItem from="1662065592780" duration="13255000" />
+      <workItem from="1662130338626" duration="736000" />
+      <workItem from="1662134480685" duration="1207000" />
+      <workItem from="1663072537598" duration="14000" />
     </task>
     <servers />
   </component>
@@ -384,17 +387,12 @@
           <line>2</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Main.py</url>
-          <line>16</line>
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/Lexical_Analyzer$Principal.coverage" NAME="Principal Coverage Results" MODIFIED="1661886514972" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/Lexical_Analyzer$Main.coverage" NAME="Main Coverage Results" MODIFIED="1662094651132" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Lexical_Analyzer$Main.coverage" NAME="Main Coverage Results" MODIFIED="1662135663790" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Lexical_Analyzer$LexicalAnalyzer.coverage" NAME="LexicalAnalyzer Coverage Results" MODIFIED="1653498117011" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../lexical-analyzer" />
     <SUITE FILE_PATH="coverage/lexical_analyzer_master$Principal.coverage" NAME="Principal Coverage Results" MODIFIED="1653498836147" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/Lexical_Analyzer$Principal__1_.coverage" NAME="Principal (1) Coverage Results" MODIFIED="1653542695650" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/../lexical-analyzer" />
