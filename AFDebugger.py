@@ -41,15 +41,15 @@ def debugger(filename):
     for line in source.split("\n"):
         dict_source[count] = line.lstrip(' ')
         dict_source[count] = " ".join(dict_source[count].split())
-        dict_source[count] = dict_source[count].replace('(', ' ( ')
-        dict_source[count] = dict_source[count].replace(')', ' ) ')
-        dict_source[count] = dict_source[count].replace('<', ' < ')
-        dict_source[count] = dict_source[count].replace('>', ' > ')
-        dict_source[count] = dict_source[count].replace('=', ' = ')
-        dict_source[count] = dict_source[count].replace('+', ' + ')
-        dict_source[count] = dict_source[count].replace('-', ' - ')
-        dict_source[count] = dict_source[count].replace('*', ' * ')
-        dict_source[count] = dict_source[count].replace(';', ' ; ')
+        # dict_source[count] = dict_source[count].replace('(', ' ( ')
+        # dict_source[count] = dict_source[count].replace(')', ' ) ')
+        # dict_source[count] = dict_source[count].replace('<', ' < ')
+        # dict_source[count] = dict_source[count].replace('>', ' > ')
+        # dict_source[count] = dict_source[count].replace('=', ' = ')
+        # dict_source[count] = dict_source[count].replace('+', ' + ')
+        # dict_source[count] = dict_source[count].replace('-', ' - ')
+        # dict_source[count] = dict_source[count].replace('*', ' * ')
+        # dict_source[count] = dict_source[count].replace(';', '; ')
 
         count += 1
         # Quitar espacios entre lineas como

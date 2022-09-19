@@ -1,4 +1,4 @@
-import Debugger
+import AFDebugger as db
 import csv
 import pandas as pd
 from Buffer import Buffer
@@ -8,7 +8,7 @@ if __name__ == '__main__':
     Buffer = Buffer()
     Analyzer = LexicalAnalyzer()
 
-    Debugger.debugger('ejemplo.af')
+    db.debugger('ejemplo.af')
 
     f = open('ejemplo.afn', 'w')
     f.write('TIPO,LEXEMA,FILA,COLUMNA\n')

@@ -1,5 +1,13 @@
-    int seed     ;
+    int seed    = " soy un ejemplo  " ;
+    int numero1    = 123 ;
+  int numero2 = numero3;
+  str numero2 = numero1;
+  int numero2 = numero1;
     str seed;
+    int seed;
+    int numero;
+    numero = 2;
+    str str;
     str comidaGratis;
 #Soy un comentario
    #Yo tambien
@@ -7,6 +15,10 @@
     boolean if;
    int228 dd;
    str 1uno;
+comidaGratis = str;
+seed = "hola";
+int = int;
+boolean = int;
 
 
    "letrero"
@@ -15,26 +27,12 @@
    int a;
    cad;
 
-
-
-
-   str paubonita;
-   INT a;
-   a;
-   boolean bandera;
-   int v@r;
-
-
-   a int;
-
 #borrarlo
  #Este es un comentario
     int a3;
-
-
 i                               n                             t;
-
 boolean correc;#ta
 str ra%ra;
 str bien;
 int [];
+boolean vientos = correc;
