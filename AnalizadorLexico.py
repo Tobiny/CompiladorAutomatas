@@ -10,10 +10,11 @@ declaraAsignaVar = [re.compile(r'(^str)\s*([a-zA-Z]+[0-9]*)\s*=\s*([a-zA-Z]+[0-9
                     re.compile(r'(^int)\s*([a-zA-Z]+[0-9]*)\s*=\s*([a-zA-Z]+[0-9]*)\s*(;$)'),
                     re.compile(r'(^boolean)\s*([a-zA-Z]+[0-9]*)\s*=\s*([a-zA-Z]+[0-9]*)\s*(;$)')]
 
-asignaciones = [re.compile(r'^([a-zA-Z]+[0-9]*)\s*=\s*([a-zA-Z]+[0-9]*)\s*(;$)'),  # Para variables
-                re.compile(r'^([a-zA-Z]+[0-9]*)\s*=\s*([0-9])+\s*(;$)'),  # Para int
+asignaciones = [re.compile(r'^([a-zA-Z]+[0-9]*)\s*=\s*(True|False)\s*(;$)'),
+                re.compile(r'^([a-zA-Z]+[0-9]*)\s*=\s*([a-zA-Z]+[0-9]*)\s*(;$)'),  # Para variables
+                re.compile(r'^([a-zA-Z]+[0-9]*)\s*=\s*([0-9]+)\s*(;$)'),  # Para int
                 re.compile(r'^([a-zA-Z]+[0-9]*)\s*=\s*(\"[^\"]*\")\s*(;$)'),  # Para str
-                re.compile(r'^([a-zA-Z]+[0-9]*)\s*=\s*(True|False)+\s*(;$)')]  # Para boolean
+                ]  # Para boolean
 tabsim = []
 
 palabras = ['main', 'int', 'boolean', 'str', 'readin', 'print', 'for', 'if', 'while', 'else']
@@ -27,7 +28,6 @@ def ispalres(pal, declarar):
 
 
 def lexan(linea):
-
     for a in range(0, len(declaraciones)):
         m = declaraciones[a].match(linea[0])
         if m:
@@ -66,7 +66,8 @@ def lexan(linea):
             else:
                 asDeVarTabSim(linea, m)
                 return
-    print("Error, revise la línea",linea[1],"ya que existe un error de sintaxis en la declaración o asignación")
+    print("Error, revise la línea", linea[1], "ya que existe un error de sintaxis en la declaración o asignación")
+
 
 def addTabSim(linea, m):
     declarada = False
@@ -78,9 +79,7 @@ def addTabSim(linea, m):
         print('Error, variable ya declarada, en la línea', linea[1])
         return False
     else:
-        add = []
-        add.append(m.group(2))
-        add.append(m.group(1))
+        add = [m.group(2), m.group(1)]
         if m.group(1) == 'int':
             add.append(0)
         elif m.group(1) == 'str':
@@ -91,32 +90,46 @@ def addTabSim(linea, m):
         tabsim.append(add)
         return True
 
+
 def asigTabSim(linea, m, it):
+    declarada = False
     for simb in tabsim:
         if m.group(1) == simb[0]:
-            if it == 1:
-                if simb[1] == 'int':
-                    simb[2] = int(m.group(2))
-                else:
-                    print("Error, está intentando introducir un entero a una variable de otro tipo en la línea ", linea[1])
-                    return False
-            elif it == 2:
-                if simb[1] == 'str':
-                    simb[2] = m.group(2)
-                else:
-                    print("Error, está intentando introducir una cadena a una variable de otro tipo en la línea ", linea[1])
-                    return False
-            elif it == 3:
+            declarada = True
+            if it == 0:
                 if simb[1] == 'boolean':
-                    simb[2] = m.group(2)
+                    if m.group(2) == 'False':
+                        simb[2] = False
+                    else:
+                        simb[2] = True
                 else:
-                    print("Error, está intentando introducir una bandera a una variable de otro tipo en la línea ", linea[1])
+                    print("Error, está intentando introducir una bandera a una variable de otro tipo en la línea",
+                          linea[1])
                     return False
-            elif it == 0:
+            elif it == 1:
                 for simb1 in tabsim:
                     if m.group(2) == simb1[0]:
                         simb[2] = simb1[1]
-            return True
+                    else:
+                        print("Error, variable no declarada en la linea",
+                              linea[1])
+                        return
+            elif it == 2:
+                if simb[1] == 'int':
+                    simb[2] = int(m.group(2))
+                else:
+                    print("Error, está intentando introducir un entero a una variable de otro tipo en la línea",
+                          linea[1])
+                    return False
+            elif it == 3:
+                if simb[1] == 'str':
+                    simb[2] = m.group(2)
+                else:
+                    print("Error, está intentando introducir una cadena a una variable de otro tipo en la línea",
+                          linea[1])
+                    return False
+
+
 
 
 def asDeTabSim(linea, m):
@@ -137,10 +150,16 @@ def asDeTabSim(linea, m):
         elif m.group(1) == 'str':
             add.append(m.group(3))
         elif m.group(1) == 'boolean':
-            add.append(m.group(3))
+            if m.group(3) == "False":
+                add.append(False)
+            else:
+                add.append(True)
+
         add.append('id' + str(len(tabsim)))
         tabsim.append(add)
         return True
+
+
 def asDeVarTabSim(linea, m):
     declarada, encontrada = False, False
     tipo = ""
@@ -158,13 +177,10 @@ def asDeVarTabSim(linea, m):
         return
     else:
         if m.group(1) != tipo:
-
-            print("Error, tipo de dato de la variable a asignar es distinto a la que se va a declarar en la línea",linea[1])
+            print("Error, tipo de dato de la variable a asignar es distinto a la que se va a declarar en la línea",
+                  linea[1])
             return
-        add = []
-        add.append(m.group(2))
-        add.append(m.group(1))
-
+        add = [m.group(2), m.group(1)]
         for simb in tabsim:
             if m.group(3) == simb[0]:
                 add.append(simb[2])
