@@ -193,16 +193,12 @@ def asDeVarTabSim(linea, m):
 def analisislr(expresion, tabsim, linea):
     expresion = preprocesadoCadena(expresion)
     if not revisionTokens(expresion, tabsim, linea):
-        m = re.split(r'\s*\++\s* | \s*\*+\s* | \s*\(+\s* | \s*\)+\s*', expresion)
+        m = re.split(r'\s*\++\s* | \s*\-+\s* | \s*\(+\s* | \s*\)+\s*', expresion)
         for i in range(0, len(m)):
             if m[i][0] == "(":
                 m[i] = m[i].split("(")[1]
-            elif m[i][0] == ")":
-                m[i] = m[i].split(")")[1]
             if m[i][len(m[i]) - 1] == ")":
                 m[i] = m[i].split(")")[0]
-            elif m[i][len(m[i]) - 1] == "(":
-                m[i] = m[i].split("(")[0]
         expresion = transformarExp(m, expresion)
         ACCION = [
             [("D", 5), "E", "E", ("D", 4), "E", "E"],
@@ -262,16 +258,12 @@ def preprocesadoCadena(expresion):
 
 
 def revisionTokens(expresion, tabsim, linea):
-    m = re.split(r'\s*\++\s* | \s*\*+\s* | \s*\(+\s* | \s*\)+\s*', expresion)
+    m = re.split(r'\s*\++\s* | \s*\-+\s* | \s*\(+\s* | \s*\)+\s*', expresion)
     for i in range(0, len(m)):
         if m[i][0] == "(":
             m[i] = m[i].split("(")[1]
-        elif m[i][0] == ")":
-            m[i] = m[i].split(")")[1]
         if m[i][len(m[i]) - 1] == ")":
             m[i] = m[i].split(")")[0]
-        elif m[i][len(m[i]) - 1] == "(":
-            m[i] = m[i].split("(")[0]
     errores = False
     for i in m:
         existe = False
