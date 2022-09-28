@@ -1,9 +1,9 @@
-int cadena = 10;
-str cadena = True;
-boolean flag = False1;
-int entero = cadena;
-boolean flag = True;
-flag = False;
+int fer = 99;
+int pau = 12;
+int babi = 0;
+int x = 0;
+int x = fer + (babi + pau + 1);
+x = 7 + 1;
+x = fer + babi + pau + 1);
 
-cadena = noexiste;
-cadena = 999;
+str son1130 = "LLANTO";
