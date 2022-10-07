@@ -1,8 +1,9 @@
-1: int cadena = 10;
-2: str cadena = True;
-3: boolean flag = False1;
-4: int entero = cadena;
-5: boolean flag = True;
-6: flag = False;
-8: cadena = noexiste;
-9: cadena = 999;
+1: int x = 0;
+2: int a = 0;
+3: x = 7 + 1;
+4: a = ((x) + (x * 1)) * 1;
+5: int id = 1;
+6: id = id * id * (((id))) + ((id) * (id));
+7: a = 5 + ((id * (id) + ((id)) * id;
+8: a = id+id*((2)))+id);
+9: if(a>b);

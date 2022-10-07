@@ -4,6 +4,6 @@ x = 7 + 1;
 a = ((x) + (x * 1)) * 1;
 int id = 1;
 id = id * id * (((id))) + ((id) * (id));
-a = 5 + ((id * (id) + ((id)) * id
-a = id+id*((2)))+id)
-if(a>b)
+a = 5 + ((id * (id) + ((id)) * id;
+a = id+id*((2)))+id);
+if(a>b);
