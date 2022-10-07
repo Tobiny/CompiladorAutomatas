@@ -2,20 +2,23 @@ import re
 
 
 variables = re.compile(r'^[a-zA-Z]+')
-declaraciones = [re.compile(r'(^str)\s*([a-zA-Z]+[0-9]*)\s*(;$)'), re.compile(r'(^int)\s*([a-zA-Z]+[0-9]*)\s*(;$)'),
-                 re.compile(r'(^boolean)\s*([a-zA-Z]+[0-9]*)\s*(;$)')]
-declaraAsigna = [re.compile(r'(^str)\s*([a-zA-Z]+[0-9]*)\s*=\s*(\"[^\"]*\")\s*(;$)'),
-                 re.compile(r'(^int)\s*([a-zA-Z]+[0-9]*)\s*=\s*([0-9]+)\s*(;$)'),
-                 re.compile(r'(^boolean)\s*([a-zA-Z]+[0-9]*)\s*=\s*(True|False)\s*(;$)')]
+declaraciones = [re.compile(r'(^str)\s*([a-zA-Z]+[0-9]*)\s*(;$)'),  # Strings
+                 re.compile(r'(^int)\s*([a-zA-Z]+[0-9]*)\s*(;$)'),  # Integers
+                 re.compile(r'(^boolean)\s*([a-zA-Z]+[0-9]*)\s*(;$)')]  #Booleanos
+declaraAsigna = [re.compile(r'(^str)\s*([a-zA-Z]+[0-9]*)\s*=\s*(\"[^\"]*\")\s*(;$)'),  # Strings
+                 re.compile(r'(^int)\s*([a-zA-Z]+[0-9]*)\s*=\s*([0-9]+)\s*(;$)'),  # Integers
+                 re.compile(r'(^boolean)\s*([a-zA-Z]+[0-9]*)\s*=\s*(True|False)\s*(;$)')]  #Booleanos
 declaraAsignaVar = [re.compile(r'(^str)\s*([a-zA-Z]+[0-9]*)\s*=\s*([a-zA-Z]+[0-9]*)\s*(;$)'),
                     re.compile(r'(^int)\s*([a-zA-Z]+[0-9]*)\s*=\s*([a-zA-Z]+[0-9]*)\s*(;$)'),
                     re.compile(r'(^boolean)\s*([a-zA-Z]+[0-9]*)\s*=\s*([a-zA-Z]+[0-9]*)\s*(;$)')]
 
-asignaciones = [re.compile(r'^([a-zA-Z]+[0-9]*)\s*=\s*(True|False)\s*(;$)'),
+asignaciones = [re.compile(r'^([a-zA-Z]+[0-9]*)\s*=\s*(True|False)\s*(;$)'),  # Para boolean
                 re.compile(r'^([a-zA-Z]+[0-9]*)\s*=\s*([a-zA-Z]+[0-9]*)\s*(;$)'),  # Para variables
                 re.compile(r'^([a-zA-Z]+[0-9]*)\s*=\s*([0-9]+)\s*(;$)'),  # Para int
                 re.compile(r'^([a-zA-Z]+[0-9]*)\s*=\s*(\"[^\"]*\")\s*(;$)'),  # Para str
-                ]  # Para boolean
+                ]
+
+
 tabsim = []
 
 palabras = ['main', 'int', 'boolean', 'str', 'readin', 'print', 'for', 'if', 'while', 'else']
@@ -67,8 +70,50 @@ def lexan(linea):
             else:
                 asDeVarTabSim(linea, m)
                 return
-    syntactic_analyzer(linea, tabsim)
-    # print("Error, revise la línea", linea[1], "ya que existe un error de sintaxis en la declaración o asignación")
+
+    for _ in range(0,1):
+        m = re.match(r'^(int)\s+([a-zA-Z]+[0-9]*)\s*=.*([+|\-|*|\/|\(|\)])+.*(;$)', linea[0])
+        if m is not None:
+            if (m.group(2) in palabras) or (
+            re.match(r'=.*(int|main|boolean|str|readin|print|for|if|while|else).*', linea[0])):
+                print('No puede declarar variables con palabras reservadas, error en la línea ', linea[1])
+                return
+            declarada = False
+            for simb in tabsim:
+                if m.group(2) == simb[0]:
+                    declarada = True
+                    break
+            if declarada:
+                print('Error, variable ya declarada, en la línea', linea[1])
+                return False
+            if (syntactic_analyzer(linea, tabsim)):
+                tabsim.append([m.group(2), 'int', 'todavianocalculo :C', 'id' + str(len(tabsim))])
+                return
+
+    for _ in range(0, 1):
+        m = re.match(r'^([a-zA-Z]+[0-9]*)\s*=.*([+|\-|*|\/|\(|\)])+.*(;$)', linea[0])
+        if m is not None:
+            if(m.group(1) in palabras) or (
+            re.match(r'=.*(int|main|boolean|str|readin|print|for|if|while|else).*', linea[0])):
+                print('No puede declarar variables con palabras reservadas, error en la línea ', linea[1])
+                return
+            declarada = False
+            for simb in tabsim:
+                if m.group(1) == simb[0]:
+                    declarada = True
+                    break
+            if not declarada:
+                print('Error, variable no declarada, en la línea', linea[1])
+                return False
+            if (syntactic_analyzer(linea, tabsim)):
+                for variable in tabsim:
+                    if m.group(1) == variable[0]:
+                        variable[2] = 'todavianocalculo :C'
+                return
+            else:
+                return
+
+    print("Error, revise la línea", linea[1], "ya que existe un error de sintaxis en la declaración o asignación")
 
 
 
@@ -205,35 +250,41 @@ def syntactic_analyzer(linea, tabsim):
         longitudExpresion = len(expresion_procesada) - 1
         # print(linea[0] + " : " + expresion + " : " + expresion_procesada)
         ACCION = [
-            [("D", 5), "E", "E", ("D", 4), "E", "E"],
-            ["E", ("D", 6), "E", "E", "E", "A"],
-            ["E", ("R", 2), ("D", 7), "E", ("R", 2), ("R", 2)],
-            ["E", ("R", 4), ("R", 4), "E", ("R", 4), ("R", 4)],
-            [("D", 5), "E", "E", ("D", 4), "E", "E"],
-            ["E", ("R", 6), ("R", 6), "E", ("R", 6), ("R", 6)],
-            [("D", 5), "E", "E", ("D", 4), "E", "E"],
-            [("D", 5), "E", "E", ("D", 4), "E", "E"],
-            ["E", ("D", 6), "E", "E", ("D", 11), "E"],
-            ["E", ("R", 1), ("D", 7), "E", ("R", 1), ("R", 1)],
-            ["E", ("R", 3), ("R", 3), "E", ("R", 3), ("R", 3)],
-            ["E", ("R", 5), ("R", 5), "E", ("R", 5), ("R", 5)]]
+            [("D", 5), "E", "E", "E", "E", ("D", 4), "E", "E"],  # 0
+            ["E", ("D", 6), ("D", 7), "E", "E", "E", "E", "A"],  # 1
+            ["E", ("R", 3), ("R", 3), ("D", 8), ("D", 9), "E", ("R", 3), ("R", 3)],  # 2
+            ["E", ("R", 6), ("R", 6), ("R", 6), ("R", 6), "E", ("R", 6), ("R", 6)],  # 3
+            [("D", 5), "E", "E", "E", "E", ("D", 4), "E", "E"],  # 4
+            ["E", ("R", 8), ("R", 8), ("R", 8), ("R", 8), "E", ("R", 8), ("R", 8)],  # 5
+            [("D", 5), "E", "E", "E", "E", ("D", 4), "E", "E"],  # 6
+            [("D", 5), "E", "E", "E", "E", ("D", 4), "E", "E"],  # 7
+            [("D", 5), "E", "E", "E", "E", ("D", 4), "E", "E"],  # 8
+            [("D", 5), "E", "E", "E", "E", ("D", 4), "E", "E"],  # 9
+            ["E", ("D", 6), ("D", 7), "E", "E", "E", ("D", 15), "E"],  # 10
+            ["E", ("R", 1), ("R", 1), ("D", 8), ("D", 9), "E", ("R", 1), ("R", 1)],  # 11
+            ["E", ("R", 2), ("R", 2), ("D", 8), ("D", 9), "E", ("R", 2), ("R", 2)],  # 12
+            ["E", ("R", 4), ("R", 4), ("R", 4), ("R", 4), "E", ("R", 4), ("R", 4)],  # 13
+            ["E", ("R", 5), ("R", 5), ("R", 5), ("R", 5), "E", ("R", 5), ("R", 5)],  # 14
+            ["E", ("R", 7), ("R", 7), ("R", 7), ("R", 7), "E", ("R", 7), ("R", 7)]]  # 15
         IR_A = [
-            [1, 2, 3],
-            "E",
-            "E",
-            "E",
-            [8, 2, 3],
-            "E",
-            ["E", 9, 3],
-            ["E", "E", 10],
-            "E",
-            "E",
-            "E",
-            "E"]
-        # Número de Producción: regresa simbolos a retirar de la pila
-        sacarsimbolos = {1: 3, 2: 1, 3: 3, 4: 1, 5: 3, 6: 1}
-        producciones_ps = {1: 0, 2: 0, 3: 1, 4: 1, 5: 2, 6: 2}
-        simbolos = {"+": 1, "*": 2, "(": 3, ")": 4, "$": 5}
+            [1, 2, 3],  # 1
+            "E",  # 2
+            "E",  # 3
+            "E",  # 4
+            [10, 2, 3],  # 5
+            "E",  # 6
+            ["E", 11, 3],  # 7
+            ["E", 12, 3],  # 8
+            ["E", "E", 13],  # 9
+            ["E", "E", 14],  # 10
+            "E",  # 11
+            "E",  # 12
+            "E",  # 13
+            "E",  # 14
+            "E"]  # 15
+        sacarsimbolos = {1: 3, 2: 3, 3: 1, 4: 3, 5: 3, 6: 1, 7: 3, 8: 1}
+        producciones_primer_simbolo = {1: 0, 2: 0, 3: 0, 4: 1, 5: 1, 6: 1, 7: 2, 8: 2}
+        simbolos = {"+": 1, "-": 2, "*": 3, "/": 4, "(": 5, ")": 6, "$": 7}
         while True:
             if contador > longitudExpresion:
                 a = "$"
@@ -247,10 +298,10 @@ def syntactic_analyzer(linea, tabsim):
                 y = simbolos[a]
             if ACCION[x][y] == "A":
                 print("Analisis sintáctico linea " + str(numero_linea) + ": Correcto")
-                break
+                return True
             elif ACCION[x][y] == "E":
                 print("Analisis sintáctico linea " + str(numero_linea) + ": Incorrecto")
-                break
+                return False
             else:
                 siguenteAccion = ACCION[x][y][0]
                 numeroAccion = ACCION[x][y][1]
@@ -261,7 +312,7 @@ def syntactic_analyzer(linea, tabsim):
                     for x in range(sacarsimbolos[numeroAccion]):
                         pila.pop()
                     t = pila[len(pila) - 1]
-                    pila.append(IR_A[t][producciones_ps[numeroAccion]])
+                    pila.append(IR_A[t][producciones_primer_simbolo[numeroAccion]])
 
 
 def buscar_tokens(variables_en_linea, tabsim, numero_linea, expresion):
