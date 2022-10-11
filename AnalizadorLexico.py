@@ -113,6 +113,11 @@ def lexan(linea):
             else:
                 return
 
+    for _ in range(0, 1):
+        m = re.match(r'^if\(.*\);$', linea[0])
+        if m is not None:
+            logic_analyzer(linea, tabsim)
+            return
     print("Error, revise la línea", linea[1], "ya que existe un error de sintaxis en la declaración o asignación")
 
 
@@ -237,18 +242,21 @@ def asDeVarTabSim(linea, m):
 
 
 def syntactic_analyzer(linea, tabsim):
+    # Recibe array ['linea tipo string', numero de linea int]
     numero_linea = linea[1]
+    # elimina lo que viene antes del igual, el punto y coma, y los espacios
     expresion = re.sub(r'.*= *', '', linea[0]).replace(" ", "")
     expresion = re.sub(r';$','',expresion)
+    # variables en linea almacena todas las variables presentes en la linea
     variables_en_linea = re.findall(r'[a-zA-Z]+\d*', expresion)
-
     if buscar_tokens(variables_en_linea, tabsim, numero_linea, expresion):
-        pila_resultado = []
+        # variables del algoritmo LR
         pila = [0]
         contador = 0
+        # Almacena la expresion con 0s en lugar de ids, para que el analizador los tome como tal '0+0*0'
         expresion_procesada = reemplazar_variables(expresion)
         longitudExpresion = len(expresion_procesada) - 1
-        # print(linea[0] + " : " + expresion + " : " + expresion_procesada)
+        # se llena tabla de acciones, ir a y todas las relacionadas
         ACCION = [
             [("D", 5), "E", "E", "E", "E", ("D", 4), "E", "E"],  # 0
             ["E", ("D", 6), ("D", 7), "E", "E", "E", "E", "A"],  # 1
@@ -285,6 +293,109 @@ def syntactic_analyzer(linea, tabsim):
         sacarsimbolos = {1: 3, 2: 3, 3: 1, 4: 3, 5: 3, 6: 1, 7: 3, 8: 1}
         producciones_primer_simbolo = {1: 0, 2: 0, 3: 0, 4: 1, 5: 1, 6: 1, 7: 2, 8: 2}
         simbolos = {"+": 1, "-": 2, "*": 3, "/": 4, "(": 5, ")": 6, "$": 7}
+        #Algoritmo
+        while True:
+            # Si el contador es más grande que la expresión le marcamos el final de cadena de lo contrario a es igual
+            # al símbolo que estamos analizando
+            if contador > longitudExpresion:
+                a = "$"
+            else:
+                a = expresion_procesada[contador]
+            # Estado
+            x = pila[len(pila) - 1]
+            # Accion
+            y = 0
+            # Si a esta dentro de los simbolos y toma su valor en la tabla
+            if a in simbolos:
+                y = simbolos[a]
+            # Si es estado de aceptación
+            if ACCION[x][y] == "A":
+                print("Analisis sintáctico linea " + str(numero_linea) + ": Correcto")
+                return True
+            # Si es estado de error
+            elif ACCION[x][y] == "E":
+                print("Analisis sintáctico linea " + str(numero_linea) + ": Incorrecto")
+                return False
+            else:
+                # Si hay que ejecutar el algoritmo
+                siguenteAccion = ACCION[x][y][0]
+                numeroAccion = ACCION[x][y][1]
+                # Si hay que desplazar
+                if siguenteAccion == "D":
+                    pila.append(numeroAccion)
+                    contador += 1
+                # Si hay que reducir
+                elif siguenteAccion == "R":
+                    for x in range(sacarsimbolos[numeroAccion]):
+                        pila.pop()
+                    t = pila[len(pila) - 1]
+                    pila.append(IR_A[t][producciones_primer_simbolo[numeroAccion]])
+
+
+def logic_analyzer(linea, tabsim):
+    numero_linea = linea[1]
+    expresion = re.sub(r'^if\(', '', linea[0])
+    expresion = re.sub(r'\);$', '', expresion)
+    expresion = reemplazar_operadores_logicos(expresion)
+    variables_en_linea = re.findall(r'[a-zA-Z]+\d*', expresion)
+    expresion = expresion.replace(" ", "")
+    expresion_procesada = reemplazar_variables(expresion)
+    if buscar_tokens(variables_en_linea, tabsim, numero_linea, expresion):
+        pila = [0]
+        contador = 0
+        longitudExpresion = len(expresion_procesada) - 1
+        ACCION = [
+            [("D", 7), "E", "E", "E", "E", "E", "E", ("D", 5), ("D", 6), "E", "E"],  # 0
+            ["E", ("D", 8), ("D", 9), "E", "E", "E", "E", "E", "E", "E", "A"],  # 1
+            ["E", ("R", 3), ("R", 3), ("D", 10), ("D", 11), "E", "E", "E", "E", ("R", 3), ("R", 3)],  # 2
+            ["E", ("R", 6), ("R", 6), ("R", 6), ("R", 6), ("D", 12), ("D", 13), "E", "E", ("R", 6), ("R", 6)],  # 3
+            ["E", ("R", 9), ("R", 9), ("R", 9), ("R", 9), ("R", 9), ("R", 9), "E", "E", ("R", 9), ("R", 9)],  # 4
+            [("D", 7), "E", "E", "E", "E", "E", "E", ("D", 5), ("D", 6), "E", "E"],  # 5
+            [("D", 7), "E", "E", "E", "E", "E", "E", ("D", 5), ("D", 6), "E", "E"],  # 6
+            ["E", ("R", 12), ("R", 12), ("R", 12), ("R", 12), ("R", 12), ("R", 12), "E", "E", ("R", 12), ("R", 12)],  # 7
+            [("D", 7), "E", "E", "E", "E", "E", "E", ("D", 5), ("D", 6), "E", "E"],  # 8
+            [("D", 7), "E", "E", "E", "E", "E", "E", ("D", 5), ("D", 6), "E", "E"],  # 9
+            [("D", 7), "E", "E", "E", "E", "E", "E", ("D", 5), ("D", 6), "E", "E"],  # 10
+            [("D", 7), "E", "E", "E", "E", "E", "E", ("D", 5), ("D", 7), "E", "E"],  # 11
+            [("D", 7), "E", "E", "E", "E", "E", "E", ("D", 5), ("D", 7), "E", "E"],  # 12
+            [("D", 7), "E", "E", "E", "E", "E", "E", ("D", 5), ("D", 7), "E", "E"],  # 13
+            ["E", ("R", 10), ("R", 10), ("R", 10), ("R", 10), ("R", 10), ("R", 10), "E", "E", ("R", 10), ("R", 10)],  # 14
+            ["E", ("D", 8), ("D", 9), "E", "E", "E", "E", "E", "E", ("D", 22), "E"],  # 15
+            ["E", ("R", 1), ("R", 1), ("D", 10), ("D", 11), "E", "E", "E", "E", ("R", 1), ("R", 1)],  # 16
+            ["E", ("R", 2), ("R", 2), ("D", 10), ("D", 11), "E", "E", "E", "E", ("R", 2), ("R", 2)],  # 17
+            ["E", ("R", 4), ("R", 4), ("R", 4), ("R", 4), ("D", 12), ("D", 13), "E", "E", ("R", 4), ("R", 4)],  # 18
+            ["E", ("R", 5), ("R", 5), ("R", 5), ("R", 5), ("D", 12), ("D", 13), "E", "E", ("R", 5), ("R", 5)],  # 19
+            ["E", ("R", 7), ("R", 7), ("R", 7), ("R", 7), ("R", 7), ("R", 7), "E", "E", ("R", 7), ("R", 7)],  # 20
+            ["E", ("R", 8), ("R", 8), ("R", 8), ("R", 8), ("R", 8), ("R", 8), "E", "E", ("R", 8), ("R", 8)],  # 21
+            ["E", ("R", 11), ("R", 11), ("R", 11), ("R", 11), ("R", 11), ("R", 11), "E", "E", ("R", 11), ("R", 11)]]  # 22
+        IR_A = [
+            [1, 2, 3, 4],  # 0
+            ["E", "E", "E", "E"],  # 1
+            ["E", "E", "E", "E"],  # 2
+            ["E", "E", "E", "E"],  # 3
+            ["E", "E", "E", "E"],  # 4
+            ["E", "E", "E", 14],  # 5
+            [15, 2, 3, 4],  # 6
+            ["E", "E", "E", "E"],  # 7
+            ["E", 16, 3, 4],  # 8
+            ["E", 17, 3, 4],  # 9
+            ["E", "E", 18, 4],  # 10
+            ["E", "E", 19, 4],  # 11
+            ["E", "E", "E", 20],  # 12
+            ["E", "E", "E", 21],  # 13
+            ["E", "E", "E", "E"],  # 14
+            ["E", "E", "E", "E"],  # 15
+            ["E", "E", "E", "E"],  # 16
+            ["E", "E", "E", "E"],  # 17
+            ["E", "E", "E", "E"],  # 18
+            ["E", "E", "E", "E"],  # 19
+            ["E", "E", "E", "E"],  # 20
+            ["E", "E", "E", "E"],  # 21
+            ["E", "E", "E", "E"]]    # 22
+
+        sacarsimbolos = {1: 3, 2: 3, 3: 1, 4: 3, 5: 3, 6: 1, 7: 3, 8: 3, 9: 1, 10: 2, 11: 3, 12: 1}
+        producciones_primer_simbolo = {1: 0, 2: 0, 3: 0, 4: 1, 5: 1, 6: 1, 7: 2, 8: 2, 9: 2, 10: 3, 11: 3, 12: 3}
+        simbolos = {"?": 1, "¿": 2, "¡": 3, ".": 4, ">": 5, "<": 6, "!": 7, "(": 8, ")": 9, "$": 10}
         while True:
             if contador > longitudExpresion:
                 a = "$"
@@ -297,11 +408,11 @@ def syntactic_analyzer(linea, tabsim):
             if a in simbolos:
                 y = simbolos[a]
             if ACCION[x][y] == "A":
-                print("Analisis sintáctico linea " + str(numero_linea) + ": Correcto")
-                return True
+                print("Analisis lógico linea " + str(numero_linea) + ": Correcto")
+                break
             elif ACCION[x][y] == "E":
-                print("Analisis sintáctico linea " + str(numero_linea) + ": Incorrecto")
-                return False
+                print("Analisis lógico linea " + str(numero_linea) + ": Incorrecto")
+                break
             else:
                 siguenteAccion = ACCION[x][y][0]
                 numeroAccion = ACCION[x][y][1]
@@ -340,8 +451,23 @@ def buscar_tokens(variables_en_linea, tabsim, numero_linea, expresion):
 
 
 def reemplazar_variables(expresion):
-    for variable in re.findall(r'[a-zA-Z]+[0-9]*', expresion):
+    varinex = re.findall(r'[a-zA-Z]+[0-9]*', expresion)
+    varinex.sort(key=len)
+    varinex.reverse()
+    for variable in varinex:
         expresion = expresion.replace(variable, '0')
     for variable in re.findall(r'[0-9]+', expresion):
         expresion = expresion.replace(variable, '0')
+    return expresion
+
+
+def reemplazar_operadores_logicos(expresion):
+    for variable in re.findall(r'\/&', expresion):
+        expresion = expresion.replace(variable, '?')
+    for variable in re.findall(r'&&', expresion):
+        expresion = expresion.replace(variable, '¿')
+    for variable in re.findall(r'==', expresion):
+        expresion = expresion.replace(variable, '¡')
+    for variable in re.findall(r'!=', expresion):
+        expresion = expresion.replace(variable, '.')
     return expresion
