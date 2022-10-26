@@ -6,6 +6,7 @@ def debugger(filename):
     source = ''
     f = open(filename, "r")
     source = f.read()
+    pila_corchetes = []
 
     def remove_comments(string):
         pattern = r"(\".*?\"|\'.*?\')|(/\*.*?\*/|#[^\r\n]*$)"
@@ -41,6 +42,16 @@ def debugger(filename):
     for line in source.split("\n"):
         dict_source[count] = line.lstrip(' ')
         dict_source[count] = " ".join(dict_source[count].split())
+        corchetes_entrada = re.findall(r'{', line)
+        if len(corchetes_entrada) > 0:
+            pila_corchetes.append(corchetes_entrada)
+        if len(pila_corchetes) > 0 and "}" in line:
+            for _ in range(len(re.findall(r'}', line))):
+                try:
+                    pila_corchetes.pop()
+                except:
+                    print("Error, corchetes no balanceados.")
+                    quit()
         # dict_source[count] = dict_source[count].replace('(', ' ( ')
         # dict_source[count] = dict_source[count].replace(')', ' ) ')
         # dict_source[count] = dict_source[count].replace('<', ' < ')
@@ -56,6 +67,9 @@ def debugger(filename):
         # 2   hola     ejemplo
         # dict_source[count] = dict_source[count].re
 
+    if len(pila_corchetes) > 0:
+        print("Error, corchetes no balanceados.")
+        quit()
     dict_source = remove_lines(dict_source)
     string_out = ''
     count = 0 #Contador para añadir saltos de linea

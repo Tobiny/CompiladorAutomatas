@@ -3,9 +3,9 @@
 3: int a = 0;
 4: imp("X es igual a " + x + y);
 5: leer(x);
-6: if(a>x);
+6: if(a>x){
 7: x = y2 +72 + 1;
-8: a = ((y2) + (x * 1)) * 1;
+8: a = ((y2) + (x * 1)) * 1};
 9: int id = 1;
 10: id = id * 1 * (((id))) + ((id) * (id));
 11: a = 5 + ((id * (id) + ((id)) * id;
