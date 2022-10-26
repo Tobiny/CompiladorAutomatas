@@ -1,6 +1,9 @@
 int x = 0;
 int y2 = 2;
 int a = 0;
+imp("X es igual a " + x + y);
+leer(x);
+if(a>x);
 x = y2 +72 + 1;
 a = ((y2) + (x * 1)) * 1;
 int id = 1;

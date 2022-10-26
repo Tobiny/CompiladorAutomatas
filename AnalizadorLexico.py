@@ -1,3 +1,5 @@
+from enum import Flag
+from operator import le
 import re
 
 
@@ -74,54 +76,67 @@ def lexan(linea):
                 asDeVarTabSim(linea, m)
                 return
 
-    for _ in range(0,1):
-        m = re.match(r'^(int)\s+([a-zA-Z]+[0-9]*)\s*=.*([+|\-|*|\/|\(|\)])+.*(;$)', linea[0])
-        if m is not None:
-            if (m.group(2) in palabras) or (
-            re.match(r'=.*(int|main|boolean|str|readin|print|for|if|while|else).*', linea[0])):
-                print('No puede declarar variables con palabras reservadas, error en la línea ', linea[1])
-                return
-            declarada = False
-            for simb in tabsim:
-                if m.group(2) == simb[0]:
-                    declarada = True
-                    break
-            if declarada:
-                print('Error, variable ya declarada, en la línea', linea[1])
-                return False
-            if (syntactic_analyzer(linea, tabsim)):
-                tabsim.append([m.group(2), 'int', syntax_result, 'id' + str(len(tabsim))])
-                return
-
-    for _ in range(0, 1):
-        m = re.match(r'^([a-zA-Z]+[0-9]*)\s*=.*([+|\-|*|\/|\(|\)])+.*(;$)', linea[0])
-        if m is not None:
-            if(m.group(1) in palabras) or (
-            re.match(r'=.*(int|main|boolean|str|readin|print|for|if|while|else).*', linea[0])):
-                print('No puede declarar variables con palabras reservadas, error en la línea ', linea[1])
-                return
-            declarada = False
-            for simb in tabsim:
-                if m.group(1) == simb[0]:
-                    declarada = True
-                    break
-            if not declarada:
-                print('Error, variable no declarada, en la línea', linea[1])
-                return False
-            if (syntactic_analyzer(linea, tabsim)):
-                for variable in tabsim:
-                    if m.group(1) == variable[0]:
-                        variable[2] = syntax_result
-                        break
-                return
-            else:
-                return
-
-    for _ in range(0, 1):
-        m = re.match(r'^if\(.*\);$', linea[0])
-        if m is not None:
-            logic_analyzer(linea, tabsim)
+    m = re.match(r'^(int)\s+([a-zA-Z]+[0-9]*)\s*=.*([+|\-|*|\/|\(|\)])+.*(;$)', linea[0])
+    if m is not None:
+        if (m.group(2) in palabras) or (
+        re.match(r'=.*(int|main|boolean|str|readin|print|for|if|while|else).*', linea[0])):
+            print('No puede declarar variables con palabras reservadas, error en la línea ', linea[1])
             return
+        declarada = False
+        for simb in tabsim:
+            if m.group(2) == simb[0]:
+                declarada = True
+                break
+        if declarada:
+            print('Error, variable ya declarada, en la línea', linea[1])
+            return False
+        if (syntactic_analyzer(linea, tabsim)):
+            tabsim.append([m.group(2), 'int', syntax_result, 'id' + str(len(tabsim), 'NoLectura' )])
+            return
+
+    m = re.match(r'^([a-zA-Z]+[0-9]*)\s*=.*([+|\-|*|\/|\(|\)])+.*(;$)', linea[0])
+    if m is not None:
+        if(m.group(1) in palabras) or (
+        re.match(r'=.*(int|main|boolean|str|readin|print|for|if|while|else).*', linea[0])):
+            print('No puede declarar variables con palabras reservadas, error en la línea ', linea[1])
+            return
+        declarada = False
+        for simb in tabsim:
+            if m.group(1) == simb[0]:
+                declarada = True
+                break
+        if not declarada:
+            print('Error, variable no declarada, en la línea', linea[1])
+            return False
+        if (syntactic_analyzer(linea, tabsim)):
+            for variable in tabsim:
+                if m.group(1) == variable[0]:
+                    variable[2] = syntax_result
+                    variable[4] = 'NoLectura'
+                    break
+            return
+        else:
+            return
+    
+    #Revisa si es un if.
+    m = re.match(r'^if\(.*\);$', linea[0])
+    if m is not None:
+        logic_analyzer(linea, tabsim)
+        return
+
+    #Revisa si es una impresión.
+    m = re.match(r'^imp\([a-zA-Z\+\s"]*\);$', linea[0])
+    if m is not None:
+        imprimir(linea, tabsim)
+        return
+
+    #Revisa si es una lectura.
+    m = re.match(r'^leer\([a-zA-Z\+\s"]*\);$', linea[0])
+    if m is not None:
+        lectura(linea, tabsim)
+        return
+    
+    # Si no es ninguna opción marca error.
     print("Error, revise la línea", linea[1], "ya que existe un error de sintaxis en la declaración o asignación")
 
 
@@ -143,6 +158,7 @@ def addTabSim(linea, m):
         elif m.group(1) == 'boolean':
             add.append(False)
         add.append('id' + str(len(tabsim)))
+        add.append('NoLectura')
         tabsim.append(add)
         return True
 
@@ -210,6 +226,7 @@ def asDeTabSim(linea, m):
                 add.append(True)
 
         add.append('id' + str(len(tabsim)))
+        add.append('NoLectura')
         tabsim.append(add)
         return True
 
@@ -264,6 +281,7 @@ def asDeVarTabSim(linea, m):
                 add.append(simb[2])
                 break
         add.append('id' + str(len(tabsim)))
+        add.append('NoLectura')
         tabsim.append(add)
         return True
 
@@ -529,15 +547,21 @@ def logic_analyzer(linea, tabsim):
 def buscar_tokens(variables_en_linea, tabsim, numero_linea, expresion):
     variable_no_declarada = False
     contador_no_declaradas = 0
-    for nombre_variable in variables_en_linea:
-        for _ in range(0, len(tabsim)):
-            if nombre_variable in tabsim[_][0]:
+    variables_lectura = []
+    for variable in variables_en_linea:
+        for simb in tabsim:
+            if variable == simb[0]:
+                if simb[4] == 'SiLectura':
+                    variables_lectura.append(variable)
                 variable_no_declarada = False
                 break
             else:
                 variable_no_declarada = True
         if variable_no_declarada:
             contador_no_declaradas += 1
+    if len(variables_lectura) > 0:
+        print("Error en linea", str(numero_linea) + ", esperando lectura de las siguientes variables:", variables_lectura)
+        return False
     if contador_no_declaradas <= 0:
         if len(re.sub('[^(]', '', expresion)) != len(re.sub('[^)]', '', expresion)):
             print("Error en linea " + str(numero_linea) + ": paréntesis no balanceados")
@@ -586,3 +610,45 @@ def reemplazar_operadores_logicos(expresion):
     for variable in re.findall(r'!=', expresion):
         expresion = expresion.replace(variable, '.')
     return expresion
+
+
+def imprimir(linea, tabsim):
+    flag = False
+    expresion = re.sub(r'^imp\(', '', linea[0])
+    expresion = re.sub(r'\);$', '', expresion)
+    variables_en_linea = re.findall(r'".*"|([^+\s]*)', expresion)
+    variables_en_linea = [el for el in variables_en_linea if el]
+
+    for variable in variables_en_linea:
+        flag = True
+        for simb in tabsim:
+            if variable != simb[0]:
+                flag = False
+            else:
+                flag = True
+                break
+        if not flag:
+            print("Error en la linea", linea[1], ", la variable", variable, "no está declarada")
+            return
+        
+    print("Analisis de impresión en la linea", linea[1], "correcto, esperando impresión")
+
+
+def lectura(linea, tabsim):
+    flag = False
+    expresion = re.sub(r'^leer\(', '', linea[0])
+    expresion = re.sub(r'\);$', '', expresion)
+
+    for simb in tabsim:
+        if expresion != simb[0]:
+            flag = False
+        else:
+            flag = True
+            simb[4] = 'SiLectura'
+            break
+    if not flag:
+        print("Error en la linea", linea[1] + ", la variable", expresion, "no está declarada")
+        return
+    
+
+    print("Analisis de lectura en la linea", linea[1], "correcto, esperando lectura")
