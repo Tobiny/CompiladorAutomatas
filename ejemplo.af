@@ -1,8 +1,20 @@
+boolean flag1 = True;
+boolean flag2 = True;
+int alpha;
+alpha=100;
+if(flag1 == !alpha){
+    imp("entro");
+    imp(alpha);
+    leer(flagx);
+}
 int x = 0;
 int y2 = 2;
 int a = 0;
 imp("X es igual a " + x + y);
 leer(x);
+if(a>y2){
+    imp("Yei");
+}
 if(a>x){
     x = y2 +72 + 1;
     a = ((y2) + (x * 1)) * 1;
@@ -13,10 +25,15 @@ a = 5 + ((id * (id) + ((id)) * id;
 a = id+id*((2)))+id);
 int b = 0;
 int q = 17;
-if(a>b);
-if(!q /& (8 != 7));
-if(1==!(2));
+if(a>b){
+    imp("Yei");
+}
+if(a < q /& (8 != 7)){
+    imp("Yei");
+}
 int ayuda = 256;
 int help = 33;
 int zeta;
-if(help > a && zeta != 100);
+if(help > a && zeta != 100){
+    imp("Yei");
+}

@@ -1,3 +1,4 @@
+from cmath import log
 from enum import Flag
 from operator import le
 import re
@@ -27,6 +28,7 @@ tabnum = []
 palabras = ['main', 'int', 'boolean', 'str', 'readin', 'print', 'for', 'if', 'while', 'else']
 declar = ['int', 'str', 'boolean']
 syntax_result = 0
+logic_result = True
 
 
 def ispalres(pal, declarar):
@@ -36,6 +38,13 @@ def ispalres(pal, declarar):
 
 
 def lexan(linea):
+
+    if re.match(r'}$', linea[0]):
+        global logic_result
+        logic_result = True
+    if not logic_result:
+        return
+
     for a in range(0, len(declaraciones)):
         m = declaraciones[a].match(linea[0])
         if m:
@@ -118,22 +127,27 @@ def lexan(linea):
         else:
             return
     
-    #Revisa si es un if.
-    m = re.match(r'^if\(.*\);$', linea[0])
+    # Revisa si es un if.
+    m = re.match(r'^if\(.*\){$', linea[0])
     if m is not None:
-        logic_analyzer(linea, tabsim)
-        return
+        if logic_analyzer(linea, tabsim):
+            return
 
-    #Revisa si es una impresión.
+    # Revisa si es una impresión.
     m = re.match(r'^imp\([a-zA-Z\+\s"]*\);$', linea[0])
     if m is not None:
         imprimir(linea, tabsim)
         return
 
-    #Revisa si es una lectura.
+    # Revisa si es una lectura.
     m = re.match(r'^leer\([a-zA-Z\+\s"]*\);$', linea[0])
     if m is not None:
         lectura(linea, tabsim)
+        return
+
+    # Revisa si es un corchete de cierre.
+    m = re.match(r'}', linea[0])
+    if m is not None:
         return
     
     # Si no es ninguna opción marca error.
@@ -453,15 +467,22 @@ def syntactic_analyzer(linea, tabsim):
 def logic_analyzer(linea, tabsim):
     numero_linea = linea[1]
     expresion = re.sub(r'^if\(', '', linea[0])
-    expresion = re.sub(r'\);$', '', expresion)
+    expresion = re.sub(r'\){', '', expresion)
     expresion = reemplazar_operadores_logicos(expresion)
-    variables_en_linea = re.findall(r'[a-zA-Z]+\d*', expresion)
     expresion = expresion.replace(" ", "")
+    variables_en_linea = re.findall(r'[a-zA-Z]+\d*', expresion)
+    numeros_en_linea = re.findall(r'\b\d+\b', expresion)
+    addTablaNum(numeros_en_linea)
     expresion_procesada = reemplazar_variables(expresion)
     if buscar_tokens(variables_en_linea, tabsim, numero_linea, expresion):
         pila = [0]
+        pilaValores = []
+        contExpresion = 0
+        tope = 0
         contador = 0
+        expresion_procesada = reemplazar_variables(expresion)
         longitudExpresion = len(expresion_procesada) - 1
+        varinex = re.findall(r'[a-zA-Z]+[0-9]*', expresion_procesada)
         ACCION = [
             [("D", 7), "E", "E", "E", "E", "E", "E", ("D", 5), ("D", 6), "E", "E"],  # 0
             ["E", ("D", 8), ("D", 9), "E", "E", "E", "E", "E", "E", "E", "A"],  # 1
@@ -515,10 +536,18 @@ def logic_analyzer(linea, tabsim):
         producciones_primer_simbolo = {1: 0, 2: 0, 3: 0, 4: 1, 5: 1, 6: 1, 7: 2, 8: 2, 9: 2, 10: 3, 11: 3, 12: 3}
         simbolos = {"?": 1, "¿": 2, "¡": 3, ".": 4, ">": 5, "<": 6, "!": 7, "(": 8, ")": 9, "$": 10}
         while True:
-            if contador > longitudExpresion:
+            flag = "o"
+            if contExpresion > longitudExpresion:
                 a = "$"
             else:
-                a = expresion_procesada[contador]
+                a = expresion_procesada[contExpresion]
+                # Si el elemento inicia con "i" o "n" cambia la bandera a su respetivo caso.
+                if a == "i" or a == "n":
+                    flag = a
+                    # Almacena el id de la variable o número en "a".
+                    a = varinex[contador]
+                    # Mueve el apuntador hasta el final del id.
+                    contExpresion += len(a)
             # Estado
             x = pila[len(pila) - 1]
             # Accion
@@ -527,21 +556,63 @@ def logic_analyzer(linea, tabsim):
                 y = simbolos[a]
             if ACCION[x][y] == "A":
                 print("Analisis lógico linea " + str(numero_linea) + ": Correcto")
-                break
+                global logic_result
+                logic_result = pilaValores[tope-1]
+                print("Comparación", logic_result)
+                tabnum.clear()
+                return True
             elif ACCION[x][y] == "E":
                 print("Analisis lógico linea " + str(numero_linea) + ": Incorrecto")
-                break
+                return False
             else:
                 siguenteAccion = ACCION[x][y][0]
                 numeroAccion = ACCION[x][y][1]
                 if siguenteAccion == "D":
                     pila.append(numeroAccion)
-                    contador += 1
+                    if not flag == "o":
+                        if flag == "i":
+                            for simb in tabsim:
+                                if a == simb[3]:
+                                    pilaValores.append(simb[2])
+                                    break
+                        else:
+                            for num in tabnum:
+                                if a == num[1]:
+                                    pilaValores.append(num[0])
+                                    break
+                        tope += 1
+                        # Actualiza el contador de las variables y número analizados.
+                        contador += 1
+                    # Si es un operador solamente recorre el apuntador una posición.
+                    else:
+                        contExpresion += 1
                 elif siguenteAccion == "R":
                     for x in range(sacarsimbolos[numeroAccion]):
                         pila.pop()
                     t = pila[len(pila) - 1]
                     pila.append(IR_A[t][producciones_primer_simbolo[numeroAccion]])
+                    if sacarsimbolos[numeroAccion] >= 2 and not numeroAccion == 11:
+                        # Almacena el resultado de la respectiva operación en la penúltima posición de la pila. 
+                        match numeroAccion:
+                            case 1:
+                                pilaValores[tope-2] = pilaValores[tope-2] or pilaValores[tope-1]
+                            case 2:
+                                pilaValores[tope-2] = pilaValores[tope-2] and pilaValores[tope-1]
+                            case 4:
+                                pilaValores[tope-2] = pilaValores[tope-2] == pilaValores[tope-1]
+                            case 5:
+                                pilaValores[tope-2] = pilaValores[tope-2] != pilaValores[tope-1]
+                            case 7:
+                                pilaValores[tope-2] = pilaValores[tope-2] > pilaValores[tope-1]
+                            case 8:
+                                pilaValores[tope-2] = pilaValores[tope-2] < pilaValores[tope-1]
+                            case 10:
+                                pilaValores[tope-1] = not pilaValores[tope-1]
+                        # Saca el último valor de la pila dejando en el tope el resultado de la operación.
+                        if numeroAccion != 10:
+                            pilaValores.pop()
+                            # Reduce el tope.
+                            tope -= 1
 
 
 def buscar_tokens(variables_en_linea, tabsim, numero_linea, expresion):
@@ -647,7 +718,7 @@ def lectura(linea, tabsim):
             simb[4] = 'SiLectura'
             break
     if not flag:
-        print("Error en la linea", linea[1] + ", la variable", expresion, "no está declarada")
+        print("Error en la linea", linea[1], ", la variable", expresion, "no está declarada")
         return
     
 

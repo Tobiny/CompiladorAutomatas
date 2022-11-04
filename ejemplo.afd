@@ -1,21 +1,42 @@
-1: int x = 0;
-2: int y2 = 2;
-3: int a = 0;
-4: imp("X es igual a " + x + y);
-5: leer(x);
-6: if(a>x){
-7: x = y2 +72 + 1;
-8: a = ((y2) + (x * 1)) * 1};
-9: int id = 1;
-10: id = id * 1 * (((id))) + ((id) * (id));
-11: a = 5 + ((id * (id) + ((id)) * id;
-12: a = id+id*((2)))+id);
-13: int b = 0;
-14: int q = 17;
-15: if(a>b);
-16: if(!q /& (8 != 7));
-17: if(1==!(2));
-18: int ayuda = 256;
-19: int help = 33;
-20: int zeta;
-21: if(help > a && zeta != 100);
+1: boolean flag1 = True;
+2: boolean flag2 = True;
+3: int alpha;
+4: alpha=100;
+5: if(!4){
+6: imp("a");
+7: }
+8: if(flag1 == !alpha){
+9: imp("entro");
+10: imp(alpha);
+11: leer(flagx);
+12: }
+13: int x = 0;
+14: int y2 = 2;
+15: int a = 0;
+16: imp("X es igual a " + x + y);
+17: leer(x);
+18: if(a>y2){
+19: imp("Yei");
+20: }
+21: if(a>x){
+22: x = y2 +72 + 1;
+23: a = ((y2) + (x * 1)) * 1;
+24: }
+25: int id = 1;
+26: id = id * 1 * (((id))) + ((id) * (id));
+27: a = 5 + ((id * (id) + ((id)) * id;
+28: a = id+id*((2)))+id);
+29: int b = 0;
+30: int q = 17;
+31: if(a>b){
+32: imp("Yei");
+33: }
+34: if(a < q /& (8 != 7)){
+35: imp("Yei");
+36: }
+37: int ayuda = 256;
+38: int help = 33;
+39: int zeta;
+40: if(help > a && zeta != 100){
+41: imp("Yei");
+42: }
