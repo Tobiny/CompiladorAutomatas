@@ -1,6 +1,3 @@
-from cmath import log
-from enum import Flag
-from operator import le
 import re
 
 
@@ -25,6 +22,7 @@ asignaciones = [re.compile(r'^([a-zA-Z]+[0-9]*)\s*=\s*(True|False)\s*(;$)'),  # 
 
 tabsim = []
 tabnum = []
+cuadroplo = []
 palabras = ['main', 'int', 'boolean', 'str', 'readin', 'print', 'for', 'if', 'while', 'else']
 declar = ['int', 'str', 'boolean']
 syntax_result = 0
@@ -39,10 +37,11 @@ def ispalres(pal, declarar):
 
 def lexan(linea):
 
-    if re.match(r'}$', linea[0]):
-        global logic_result
-        logic_result = True
+    global logic_result
+
     if not logic_result:
+        if re.match(r'.*}', linea[0]):
+            logic_result = True
         return
 
     for a in range(0, len(declaraciones)):
@@ -85,7 +84,7 @@ def lexan(linea):
                 asDeVarTabSim(linea, m)
                 return
 
-    m = re.match(r'^(int)\s+([a-zA-Z]+[0-9]*)\s*=.*([+|\-|*|\/|\(|\)])+.*(;$)', linea[0])
+    m = re.match(r'^(int)\s+([a-zA-Z]+[0-9]*)\s*=.*([+|\-|*|\/|\(|\)])+.*(;)', linea[0])
     if m is not None:
         if (m.group(2) in palabras) or (
         re.match(r'=.*(int|main|boolean|str|readin|print|for|if|while|else).*', linea[0])):
@@ -103,7 +102,7 @@ def lexan(linea):
             tabsim.append([m.group(2), 'int', syntax_result, 'id' + str(len(tabsim), 'NoLectura' )])
             return
 
-    m = re.match(r'^([a-zA-Z]+[0-9]*)\s*=.*([+|\-|*|\/|\(|\)])+.*(;$)', linea[0])
+    m = re.match(r'^([a-zA-Z]+[0-9]*)\s*=.*([+|\-|*|\/|\(|\)])+.*(;)', linea[0])
     if m is not None:
         if(m.group(1) in palabras) or (
         re.match(r'=.*(int|main|boolean|str|readin|print|for|if|while|else).*', linea[0])):
@@ -128,19 +127,19 @@ def lexan(linea):
             return
     
     # Revisa si es un if.
-    m = re.match(r'^if\(.*\){$', linea[0])
+    m = re.match(r'^if\(.*\){$|^if\(.*\){', linea[0])
     if m is not None:
-        if logic_analyzer(linea, tabsim):
-            return
+        logic_analyzer(linea, tabsim)
+        return
 
     # Revisa si es una impresión.
-    m = re.match(r'^imp\([a-zA-Z\+\s"]*\);$', linea[0])
+    m = re.match(r'^imp\([a-zA-Z0-9\+\s"]*\);', linea[0])
     if m is not None:
         imprimir(linea, tabsim)
         return
 
     # Revisa si es una lectura.
-    m = re.match(r'^leer\([a-zA-Z\+\s"]*\);$', linea[0])
+    m = re.match(r'^leer\([a-zA-Z]+[0-9]*\);', linea[0])
     if m is not None:
         lectura(linea, tabsim)
         return
@@ -302,6 +301,7 @@ def asDeVarTabSim(linea, m):
 
 # Analiíza que la línea sea sintacticamente correcta.
 def syntactic_analyzer(linea, tabsim):
+    cuadroplo.clear()
     # Recibe una lista con la línea y su numero de línea ['linea (string)', numero de linea (int)].
     numero_linea = linea[1]
     # Elimina lo que viene antes del igual, el punto y coma, y los espacios.
@@ -315,8 +315,12 @@ def syntactic_analyzer(linea, tabsim):
     addTablaNum(numeros_en_linea)
     # Busca que todas las variables estén declaradas y que los paréntesis estén balanceados.
     if buscar_tokens(variables_en_linea, tabsim, numero_linea, expresion):
+        # Crea la lista de la fila a añadir en la tabla de cuadruplos.
+        add = []
         # Crea la pila del analizador sintático.
         pila = [0]
+        # Crea la pila de los id's para usarlos en los cuadruplos.
+        pilaIdentificadores = []
         # Crea la pila donde se guardarán los valores de las variables y los números de la expresión. Eventualmente guardará el resultado final.
         pilaValores = []
         # Contador para avanzar el apuntador dentro de la expresión para saber qué elemento está analizando.
@@ -403,6 +407,8 @@ def syntactic_analyzer(linea, tabsim):
                 syntax_result = pilaValores[tope-1]
                 # Limpia la tabla de números para la siguiente operación.
                 tabnum.clear()
+                # Imprime la tabla de cuadruplos.
+                print(cuadroplo)
                 return True
             # Si es estado de error.
             elif ACCION[x][y] == "E":
@@ -430,6 +436,8 @@ def syntactic_analyzer(linea, tabsim):
                                 if a == num[1]:
                                     pilaValores.append(num[0])
                                     break
+                        # Añade el id a la pila de id's.
+                        pilaIdentificadores.append(a)
                         # Aumenta el tope de la tabla de valores.
                         tope += 1
                         # Actualiza el contador de las variables y número analizados.
@@ -448,16 +456,59 @@ def syntactic_analyzer(linea, tabsim):
                     pila.append(IR_A[t][producciones_primer_simbolo[numeroAccion]])
                     # Si la producción es de suma, resta, multiplicación o división realiza la operación.
                     if sacarsimbolos[numeroAccion] == 3 and not numeroAccion == 7:
+                        # Marca si es operación.
+                        es_operacion = True
+                        # Limpia el cuadruplo.
+                        add = []
                         # Almacena el resultado de la respectiva operación en la penúltima posición de la pila. 
                         match numeroAccion:
                             case 1:
                                 pilaValores[tope-2] += pilaValores[tope-1]
+                                add.append("+")
                             case 2:
                                 pilaValores[tope-2] -= pilaValores[tope-1]
+                                add.append("-")
                             case 4:
                                 pilaValores[tope-2] *= pilaValores[tope-1]
+                                add.append("*")
                             case 5:
                                 pilaValores[tope-2] /= pilaValores[tope-1]
+                                add.append("/")
+                        # Añade al cuadruplo las variables o los numeros de la operación.
+                        if pilaIdentificadores[tope-2][0] == "i":
+                            for simb in tabsim:
+                                if pilaIdentificadores[tope-2] == simb[3]:
+                                    add.append(simb[0])
+                                    es_operacion = False
+                                    break
+                        else:
+                            for num in tabnum:
+                                if pilaIdentificadores[tope-2] == num[1]:
+                                    add.append(num[0])
+                                    es_operacion = False
+                                    break
+                        if es_operacion:
+                            add.append(pilaIdentificadores[tope-2])
+                        es_operacion = True
+                        if pilaIdentificadores[tope-1][0] == "i":
+                            for simb in tabsim:
+                                if pilaIdentificadores[tope-1] == simb[1]:
+                                    add.append(simb[0])
+                                    es_operacion = False
+                                    break
+                        else:
+                            for num in tabnum:
+                                if pilaIdentificadores[tope-1] == num[1]:
+                                    add.append(num[0])
+                                    es_operacion = False
+                                    break
+                        if es_operacion:  
+                            add.append(pilaIdentificadores[tope-1])
+                        es_operacion = True
+                        add.append('t' + str(len(cuadroplo)+1))
+                        cuadroplo.append(add)
+                        pilaIdentificadores[tope-2] = add[3]
+                        pilaIdentificadores.pop()
                         # Saca el último valor de la pila dejando en el tope el resultado de la operación.
                         pilaValores.pop()
                         # Reduce el tope.
@@ -466,8 +517,11 @@ def syntactic_analyzer(linea, tabsim):
 
 def logic_analyzer(linea, tabsim):
     numero_linea = linea[1]
+    instruccion = linea[0].split('{')
+    instruccion.pop(0)
+    instruccion.append(numero_linea)
     expresion = re.sub(r'^if\(', '', linea[0])
-    expresion = re.sub(r'\){', '', expresion)
+    expresion = re.sub(r'\){.*', '', expresion)
     expresion = reemplazar_operadores_logicos(expresion)
     expresion = expresion.replace(" ", "")
     variables_en_linea = re.findall(r'[a-zA-Z]+\d*', expresion)
@@ -560,6 +614,8 @@ def logic_analyzer(linea, tabsim):
                 logic_result = pilaValores[tope-1]
                 print("Comparación", logic_result)
                 tabnum.clear()
+                if instruccion[0] != '':
+                    lexan(instruccion)
                 return True
             elif ACCION[x][y] == "E":
                 print("Analisis lógico linea " + str(numero_linea) + ": Incorrecto")
@@ -686,7 +742,7 @@ def reemplazar_operadores_logicos(expresion):
 def imprimir(linea, tabsim):
     flag = False
     expresion = re.sub(r'^imp\(', '', linea[0])
-    expresion = re.sub(r'\);$', '', expresion)
+    expresion = re.sub(r'\);}*', '', expresion)
     variables_en_linea = re.findall(r'".*"|([^+\s]*)', expresion)
     variables_en_linea = [el for el in variables_en_linea if el]
 
@@ -708,7 +764,7 @@ def imprimir(linea, tabsim):
 def lectura(linea, tabsim):
     flag = False
     expresion = re.sub(r'^leer\(', '', linea[0])
-    expresion = re.sub(r'\);$', '', expresion)
+    expresion = re.sub(r'\);}*', '', expresion)
 
     for simb in tabsim:
         if expresion != simb[0]:

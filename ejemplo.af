@@ -5,8 +5,9 @@ alpha=100;
 if(flag1 == !alpha){
     imp("entro");
     imp(alpha);
-    leer(flagx);
+    leer(flag1);
 }
+if(flag2 == flag2){imp("Yei");}
 int x = 0;
 int y2 = 2;
 int a = 0;
