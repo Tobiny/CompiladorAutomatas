@@ -1,11 +1,16 @@
-boolean flag1 = True;
+boolean flag1 = False;
 boolean flag2 = True;
+boolean flag3;
 int alpha;
 alpha=100;
-if(flag1 == !alpha){
+flag3 = flag1 + alpha;
+if(1+1<2+2){
     imp("entro");
     imp(alpha);
     leer(flag1);
+}
+while(True){
+    imp("aaaaa");
 }
 if(flag2 == flag2){imp("Yei");}
 int x = 0;

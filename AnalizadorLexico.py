@@ -27,6 +27,7 @@ palabras = ['main', 'int', 'boolean', 'str', 'readin', 'print', 'for', 'if', 'wh
 declar = ['int', 'str', 'boolean']
 syntax_result = 0
 logic_result = True
+operacion_en_comparacion = False
 
 
 def ispalres(pal, declarar):
@@ -128,6 +129,12 @@ def lexan(linea):
     
     # Revisa si es un if.
     m = re.match(r'^if\(.*\){$|^if\(.*\){', linea[0])
+    if m is not None:
+        logic_analyzer(linea, tabsim)
+        return
+
+    # Revisa si es un while.
+    m = re.match(r'^while\(.*\){$|^while\(.*\){', linea[0])
     if m is not None:
         logic_analyzer(linea, tabsim)
         return
@@ -301,7 +308,8 @@ def asDeVarTabSim(linea, m):
 
 # Analiíza que la línea sea sintacticamente correcta.
 def syntactic_analyzer(linea, tabsim):
-    cuadroplo.clear()
+    if not operacion_en_comparacion:
+        cuadroplo.clear()
     # Recibe una lista con la línea y su numero de línea ['linea (string)', numero de linea (int)].
     numero_linea = linea[1]
     # Elimina lo que viene antes del igual, el punto y coma, y los espacios.
@@ -309,6 +317,12 @@ def syntactic_analyzer(linea, tabsim):
     expresion = re.sub(r';$','',expresion)
     # Almacena todas las variables presentes en la linea.
     variables_en_linea = re.findall(r'[a-zA-Z]+\d*', expresion)
+    # Analiza que no sean booleanos o strings.
+    for simb in tabsim:
+        for var in variables_en_linea:
+            if var == simb[0] and (simb[1] == "str" or simb[1] == "boolean"):
+                print("Analisis sintáctico linea " + str(numero_linea) + ": No se puede hacer operaciones con valores boleanos o cadenas.")
+                return False
     # Almacena todos los números presentes en la línea.
     numeros_en_linea = re.findall(r'\b\d+\b', expresion)
     # Añade estos números a la tabla de números.
@@ -385,6 +399,8 @@ def syntactic_analyzer(linea, tabsim):
             # De lo contrario a es igual al símbolo que estamos analizando.
             else:
                 a = expresion_procesada[contExpresion]
+                if a == "t":
+                    a = "n"
                 # Si el elemento inicia con "i" o "n" cambia la bandera a su respetivo caso.
                 if a == "i" or a == "n":
                     flag = a
@@ -405,10 +421,11 @@ def syntactic_analyzer(linea, tabsim):
                 # Almacena el resultado final de la operación en la variable global.
                 global syntax_result
                 syntax_result = pilaValores[tope-1]
-                # Limpia la tabla de números para la siguiente operación.
-                tabnum.clear()
-                # Imprime la tabla de cuadruplos.
-                print(cuadroplo)
+                if not operacion_en_comparacion:
+                    # Limpia la tabla de números para la siguiente operación.
+                    tabnum.clear()
+                    # Imprime la tabla de cuadruplos.
+                    print(cuadroplo)
                 return True
             # Si es estado de error.
             elif ACCION[x][y] == "E":
@@ -492,7 +509,7 @@ def syntactic_analyzer(linea, tabsim):
                         es_operacion = True
                         if pilaIdentificadores[tope-1][0] == "i":
                             for simb in tabsim:
-                                if pilaIdentificadores[tope-1] == simb[1]:
+                                if pilaIdentificadores[tope-1] == simb[3]:
                                     add.append(simb[0])
                                     es_operacion = False
                                     break
@@ -516,20 +533,50 @@ def syntactic_analyzer(linea, tabsim):
 
 
 def logic_analyzer(linea, tabsim):
+    cuadroplo.clear()
     numero_linea = linea[1]
     instruccion = linea[0].split('{')
     instruccion.pop(0)
     instruccion.append(numero_linea)
-    expresion = re.sub(r'^if\(', '', linea[0])
+    expresion = re.sub(r'^if\(|^while\(', '', linea[0])
     expresion = re.sub(r'\){.*', '', expresion)
+    if expresion == "True":
+        print("Analisis lógico linea " + str(numero_linea) + ": Correcto")
+        print("Comparación True")
+        return True
+    elif expresion == "False":
+        print("Analisis lógico linea " + str(numero_linea) + ": Correcto")
+        print("Comparación False")
+        return True
     expresion = reemplazar_operadores_logicos(expresion)
     expresion = expresion.replace(" ", "")
+    operaciones = re.findall(r'[\w\(\)\+\-\*\/]+[\+\-\*\/][\w\(\)\+\-\*\/]+', expresion)
+    operaciones = [el for el in operaciones if el]
+    if operaciones:
+        global operacion_en_comparacion
+        operacion_en_comparacion = True
+    for operacion in operaciones:
+        op = [operacion, numero_linea]
+        if not syntactic_analyzer(op, tabsim):
+            return False
+        else:
+            add = []
+            expresion = expresion.replace(operacion, str(syntax_result))
+            add.append(syntax_result)
+            add.append('t' + str(len(cuadroplo)))
+            tabnum.append(add)
     variables_en_linea = re.findall(r'[a-zA-Z]+\d*', expresion)
-    numeros_en_linea = re.findall(r'\b\d+\b', expresion)
+    variables_en_linea = [el for el in variables_en_linea if el]
+    numeros_en_linea = re.findall(r'-*\b\d+\b', expresion)
+    if not variables_en_linea and len(numeros_en_linea) == 1:
+        print("Analisis lógico linea " + str(numero_linea) + ": Incorrecto")
+        return False
     addTablaNum(numeros_en_linea)
     expresion_procesada = reemplazar_variables(expresion)
     if buscar_tokens(variables_en_linea, tabsim, numero_linea, expresion):
+        add = []
         pila = [0]
+        pilaIdentificadores = []
         pilaValores = []
         contExpresion = 0
         tope = 0
@@ -595,6 +642,8 @@ def logic_analyzer(linea, tabsim):
                 a = "$"
             else:
                 a = expresion_procesada[contExpresion]
+                if a == "t":
+                    a = "n"
                 # Si el elemento inicia con "i" o "n" cambia la bandera a su respetivo caso.
                 if a == "i" or a == "n":
                     flag = a
@@ -614,8 +663,10 @@ def logic_analyzer(linea, tabsim):
                 logic_result = pilaValores[tope-1]
                 print("Comparación", logic_result)
                 tabnum.clear()
+                print(cuadroplo)
                 if instruccion[0] != '':
                     lexan(instruccion)
+                operacion_en_comparacion = False
                 return True
             elif ACCION[x][y] == "E":
                 print("Analisis lógico linea " + str(numero_linea) + ": Incorrecto")
@@ -636,6 +687,7 @@ def logic_analyzer(linea, tabsim):
                                 if a == num[1]:
                                     pilaValores.append(num[0])
                                     break
+                        pilaIdentificadores.append(a)
                         tope += 1
                         # Actualiza el contador de las variables y número analizados.
                         contador += 1
@@ -648,25 +700,82 @@ def logic_analyzer(linea, tabsim):
                     t = pila[len(pila) - 1]
                     pila.append(IR_A[t][producciones_primer_simbolo[numeroAccion]])
                     if sacarsimbolos[numeroAccion] >= 2 and not numeroAccion == 11:
+                        # Marca si es negación.
+                        es_negacion = False
+                        # Limpia el cuadruplo.
+                        add = []
                         # Almacena el resultado de la respectiva operación en la penúltima posición de la pila. 
                         match numeroAccion:
                             case 1:
                                 pilaValores[tope-2] = pilaValores[tope-2] or pilaValores[tope-1]
+                                add.append("/&")
                             case 2:
                                 pilaValores[tope-2] = pilaValores[tope-2] and pilaValores[tope-1]
+                                add.append("&&")
                             case 4:
                                 pilaValores[tope-2] = pilaValores[tope-2] == pilaValores[tope-1]
+                                add.append("==")
                             case 5:
                                 pilaValores[tope-2] = pilaValores[tope-2] != pilaValores[tope-1]
+                                add.append("!=")
                             case 7:
                                 pilaValores[tope-2] = pilaValores[tope-2] > pilaValores[tope-1]
+                                add.append(">")
                             case 8:
                                 pilaValores[tope-2] = pilaValores[tope-2] < pilaValores[tope-1]
+                                add.append("<")
                             case 10:
+                                if isinstance(pilaValores[tope-1], int) or isinstance(pilaValores[tope-1], str):
+                                    print("Analisis lógico linea " + str(numero_linea) + ": Solo se pueden negar variables boleanas.")
+                                    logic_result = False
+                                    return False
                                 pilaValores[tope-1] = not pilaValores[tope-1]
+                                add.append("!")
+                                es_negacion = True
+                        # Añade al cuadruplo las variables o los numeros de la operación.
+                        if pilaIdentificadores[tope-2][0] == "i":
+                            for simb in tabsim:
+                                if es_negacion:
+                                    if pilaIdentificadores[tope-1] == simb[3]:
+                                        add.append(simb[0])
+                                        break
+                                else:
+                                    if pilaIdentificadores[tope-2] == simb[3]:
+                                        add.append(simb[0])
+                                        break
+                        elif pilaIdentificadores[tope-2][0] == "n":
+                            for num in tabnum:
+                                if pilaIdentificadores[tope-2] == num[1]:
+                                    add.append(num[0])
+                                    break
+                        else:
+                            add.append(pilaIdentificadores[tope-2])
+                        if es_negacion:
+                            add.append('')
+                        else:
+                            if pilaIdentificadores[tope-1][0] == "i":
+                                for simb in tabsim:
+                                    if pilaIdentificadores[tope-1] == simb[3]:
+                                        add.append(simb[0])
+                                        break
+                            elif pilaIdentificadores[tope-1][0] == "n":
+                                for num in tabnum:
+                                    if pilaIdentificadores[tope-1] == num[1]:
+                                        add.append(num[0])
+                                        break
+                            else:
+                                add.append(pilaIdentificadores[tope-1])
+                        add.append('t' + str(len(cuadroplo)+1))
+                        cuadroplo.append(add)
+                        if es_negacion:
+                            pilaIdentificadores[tope-2] = add[3]
+                        else:
+                            pilaIdentificadores[tope-1] = add[3]
+                        es_negacion = False
                         # Saca el último valor de la pila dejando en el tope el resultado de la operación.
                         if numeroAccion != 10:
                             pilaValores.pop()
+                            pilaIdentificadores.pop()
                             # Reduce el tope.
                             tope -= 1
 
@@ -704,7 +813,7 @@ def buscar_tokens(variables_en_linea, tabsim, numero_linea, expresion):
 # Remplaza las variables y los números en la expresión para trabajar con sus id's. 
 def reemplazar_variables(expresion):
     # Busca todas las variables y/o números en la expresión.
-    varinex = re.findall(r'[a-zA-Z]+[0-9]*|\b\d+\b', expresion)
+    varinex = re.findall(r'[a-zA-Z]+[0-9]*|\B-\b\d+\b|\b\d+\b', expresion)
     # Elimina los repetidos.
     varinex = list(dict.fromkeys(varinex))
     # Los ordena por longitud.
@@ -712,7 +821,7 @@ def reemplazar_variables(expresion):
     # Invierte el orden.
     varinex.reverse()
     # Por cada número en la expresión lo busca en la tabla de números y lo reemplaza dentro de la expresión con su id.
-    for variable in re.findall(r'\b\d+\b', expresion):
+    for variable in dict.fromkeys(re.findall(r'\B-\b\d+\b|\b\d+\b', expresion)):
         for num in tabnum:
             if int(variable) == num[0]:
                 expresion = expresion.replace(variable, num[1])
@@ -724,7 +833,7 @@ def reemplazar_variables(expresion):
                 expresion = expresion.replace(variable, simb[3])
                 break
     # Regresa la expresión ahora con los id's en lugar de las variables y números.
-    return expresion
+    return expresion 
 
 
 def reemplazar_operadores_logicos(expresion):
