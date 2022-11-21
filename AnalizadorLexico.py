@@ -22,12 +22,14 @@ asignaciones = [re.compile(r'^([a-zA-Z]+[0-9]*)\s*=\s*(True|False)\s*(;$)'),  # 
 
 tabsim = []
 tabnum = []
+strings = []
 cuadroplo = []
-palabras = ['main', 'int', 'boolean', 'str', 'readin', 'print', 'for', 'if', 'while', 'else']
+palabras = ['main', 'int', 'boolean', 'str', 'leer', 'imp', 'for', 'if', 'while', 'else']
 declar = ['int', 'str', 'boolean']
 syntax_result = 0
 logic_result = True
 operacion_en_comparacion = False
+error = False
 
 
 def ispalres(pal, declarar):
@@ -43,54 +45,54 @@ def lexan(linea):
     if not logic_result:
         if re.match(r'.*}', linea[0]):
             logic_result = True
-        return
+        return True
 
     for a in range(0, len(declaraciones)):
         m = declaraciones[a].match(linea[0])
         if m:
             if m.group(2) in palabras:
                 print('No puede declarar variables con palabras reservadas, error en la línea ', linea[1])
-                return
+                return False
             else:
                 addTabSim(linea, m)
-                return
+                return True
 
     for a in range(0, len(asignaciones)):
         m = asignaciones[a].match(linea[0])
         if m:
             if (m.group(1) in palabras) or (m.group(2) in palabras):
                 print('No puede asignar el valor a las palabras reservadas, error en la linea', linea[1])
-                return
+                return False
             else:
                 asigTabSim(linea, m, a)
-                return
+                return True
 
     for a in range(0, len(declaraAsigna)):
         m = declaraAsigna[a].match(linea[0])
         if m:
             if (m.group(2) in palabras) or (m.group(3) in palabras):
                 print('No puede declarar variables con palabras reservadas, error en la línea', linea[1])
-                return
+                return False
             else:
                 asDeTabSim(linea, m)
-                return
+                return True
                 
     for a in range(0, len(declaraAsignaVar)):
         m = declaraAsignaVar[a].match(linea[0])
         if m:
             if (m.group(2) in palabras) or (m.group(3) in palabras):
                 print('No puede declarar variables con palabras reservadas, error en la línea', linea[1])
-                return
+                return False
             else:
                 asDeVarTabSim(linea, m)
-                return
+                return True
 
     m = re.match(r'^(int)\s+([a-zA-Z]+[0-9]*)\s*=.*([+|\-|*|\/|\(|\)])+.*(;)', linea[0])
     if m is not None:
         if (m.group(2) in palabras) or (
         re.match(r'=.*(int|main|boolean|str|readin|print|for|if|while|else).*', linea[0])):
             print('No puede declarar variables con palabras reservadas, error en la línea ', linea[1])
-            return
+            return False
         declarada = False
         for simb in tabsim:
             if m.group(2) == simb[0]:
@@ -101,14 +103,14 @@ def lexan(linea):
             return False
         if (syntactic_analyzer(linea, tabsim)):
             tabsim.append([m.group(2), 'int', syntax_result, 'id' + str(len(tabsim), 'NoLectura' )])
-            return
+            return True
 
     m = re.match(r'^([a-zA-Z]+[0-9]*)\s*=.*([+|\-|*|\/|\(|\)])+.*(;)', linea[0])
     if m is not None:
         if(m.group(1) in palabras) or (
         re.match(r'=.*(int|main|boolean|str|readin|print|for|if|while|else).*', linea[0])):
             print('No puede declarar variables con palabras reservadas, error en la línea ', linea[1])
-            return
+            return False
         declarada = False
         for simb in tabsim:
             if m.group(1) == simb[0]:
@@ -123,33 +125,29 @@ def lexan(linea):
                     variable[2] = syntax_result
                     variable[4] = 'NoLectura'
                     break
-            return
+            return True
         else:
-            return
+            return False
     
     # Revisa si es un if.
     m = re.match(r'^if\(.*\){$|^if\(.*\){', linea[0])
     if m is not None:
-        logic_analyzer(linea, tabsim)
-        return
+        return logic_analyzer(linea, tabsim)
 
     # Revisa si es un while.
     m = re.match(r'^while\(.*\){$|^while\(.*\){', linea[0])
     if m is not None:
-        logic_analyzer(linea, tabsim)
-        return
+        return logic_analyzer(linea, tabsim)
 
     # Revisa si es una impresión.
     m = re.match(r'^imp\([a-zA-Z0-9\+\s"]*\);', linea[0])
     if m is not None:
-        imprimir(linea, tabsim)
-        return
+        return imprimir(linea, tabsim)
 
     # Revisa si es una lectura.
     m = re.match(r'^leer\([a-zA-Z]+[0-9]*\);', linea[0])
     if m is not None:
-        lectura(linea, tabsim)
-        return
+        return lectura(linea, tabsim)
 
     # Revisa si es un corchete de cierre.
     m = re.match(r'}', linea[0])
@@ -205,7 +203,7 @@ def asigTabSim(linea, m, it):
                     else:
                         print("Error, variable no declarada en la linea",
                               linea[1])
-                        return
+                        return False
             elif it == 2:
                 if simb[1] == 'int':
                     simb[2] = int(m.group(2))
@@ -264,15 +262,13 @@ def addTablaNum(numeros_en_linea):
                     break
         # Si hay repetidos pasa al siguiente número.
         if declarada:
-            break
+            declarada = False
         # Añade el número commo valor entero y su identificador de tipo n0, n1, etc.
         else:
             add = []
             add.append(int(n))
             add.append('n' + str(len(tabnum)))
             tabnum.append(add)
-    
-    return
 
 
 def asDeVarTabSim(linea, m):
@@ -286,15 +282,15 @@ def asDeVarTabSim(linea, m):
             tipo = simb[1]
     if declarada:
         print('Error, variable ya declarada, en la línea', linea[1])
-        return
+        return False
     if not encontrada:
         print('Error, variable a asignar no ha sido declarada, en la línea', linea[1])
-        return
+        return False
     else:
         if m.group(1) != tipo:
             print("Error, tipo de dato de la variable a asignar es distinto a la que se va a declarar en la línea",
                   linea[1])
-            return
+            return False
         add = [m.group(2), m.group(1)]
         for simb in tabsim:
             if m.group(3) == simb[0]:
@@ -821,10 +817,11 @@ def reemplazar_variables(expresion):
     # Invierte el orden.
     varinex.reverse()
     # Por cada número en la expresión lo busca en la tabla de números y lo reemplaza dentro de la expresión con su id.
-    for variable in dict.fromkeys(re.findall(r'\B-\b\d+\b|\b\d+\b', expresion)):
+    for variable in dict.fromkeys(re.findall(r'\B-\d+\b|\b\d+\b', expresion)):
         for num in tabnum:
             if int(variable) == num[0]:
-                expresion = expresion.replace(variable, num[1])
+                reemplazo_regex = r'\b' + re.escape(variable) + r'\b'
+                expresion = re.sub(reemplazo_regex, num[1], expresion)
                 break
     # Por cada variable en la expresión la busca en la tabla de símbolos y la reemplaza dentro de la expresión con su id.
     for variable in varinex:
@@ -852,8 +849,14 @@ def imprimir(linea, tabsim):
     flag = False
     expresion = re.sub(r'^imp\(', '', linea[0])
     expresion = re.sub(r'\);}*', '', expresion)
+    cadenas = re.findall(r'".*"', expresion)
+    cadenas = [el for el in cadenas if el]
     variables_en_linea = re.findall(r'".*"|([^+\s]*)', expresion)
     variables_en_linea = [el for el in variables_en_linea if el]
+
+    for cadena in cadenas:
+        cadena = re.sub(r'"', '',  cadena)
+        strings.append(cadena)
 
     for variable in variables_en_linea:
         flag = True
@@ -865,9 +868,10 @@ def imprimir(linea, tabsim):
                 break
         if not flag:
             print("Error en la linea", linea[1], ", la variable", variable, "no está declarada")
-            return
+            return False
         
     print("Analisis de impresión en la linea", linea[1], "correcto, esperando impresión")
+    return True
 
 
 def lectura(linea, tabsim):
@@ -884,7 +888,8 @@ def lectura(linea, tabsim):
             break
     if not flag:
         print("Error en la linea", linea[1], ", la variable", expresion, "no está declarada")
-        return
+        return False
     
 
     print("Analisis de lectura en la linea", linea[1], "correcto, esperando lectura")
+    return True

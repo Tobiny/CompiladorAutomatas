@@ -1,0 +1,4 @@
+1: int x = 10;
+2: str cad = "Hola";
+3: imp("Hola");
+4: imp("Mundo");

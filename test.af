@@ -1,0 +1,4 @@
+int x = 10;
+str cad = "Hola";
+imp("Hola");
+imp("Mundo");

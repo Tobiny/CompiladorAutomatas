@@ -3,8 +3,11 @@ boolean flag2 = True;
 boolean flag3;
 int alpha;
 alpha=100;
+int y2 = 1;
+int x;
+x = y2 +72 + 1 * 2;
 flag3 = flag1 + alpha;
-if(1+1<2+2){
+if(1+1<2+2*4){
     imp("entro");
     imp(alpha);
     leer(flag1);
@@ -22,7 +25,7 @@ if(a>y2){
     imp("Yei");
 }
 if(a>x){
-    x = y2 +72 + 1;
+    x = y2 +72 + 1 + 2;
     a = ((y2) + (x * 1)) * 1;
 }
 int id = 1;
