@@ -1,4 +1,8 @@
 1: int x = 10;
-2: str cad = "Hola";
-3: imp("Hola");
-4: imp("Mundo");
+2: int y;
+3: int z;
+4: str cad = "Hola";
+5: imp(cad + "Mundo");
+6: leer(y);
+7: y = 20;
+8: z = x + y;

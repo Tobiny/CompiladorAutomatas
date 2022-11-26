@@ -1,4 +1,8 @@
 int x = 10;
+int y;
+int z;
 str cad = "Hola";
-imp("Hola");
-imp("Mundo");
+imp(cad + "Mundo");
+leer(y);
+y = 20;
+z = x + y;

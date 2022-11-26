@@ -1,4 +1,5 @@
 import re
+import CopiarEnsamblador as copy
 
 
 variables = re.compile(r'^[a-zA-Z]+')
@@ -22,7 +23,6 @@ asignaciones = [re.compile(r'^([a-zA-Z]+[0-9]*)\s*=\s*(True|False)\s*(;$)'),  # 
 
 tabsim = []
 tabnum = []
-strings = []
 cuadroplo = []
 palabras = ['main', 'int', 'boolean', 'str', 'leer', 'imp', 'for', 'if', 'while', 'else']
 declar = ['int', 'str', 'boolean']
@@ -30,6 +30,7 @@ syntax_result = 0
 logic_result = True
 operacion_en_comparacion = False
 error = False
+resetear = True
 
 
 def ispalres(pal, declarar):
@@ -38,10 +39,17 @@ def ispalres(pal, declarar):
     return pal in palabras
 
 
-def lexan(linea):
-
+def lexan(linea, iteracion):
+    
     global logic_result
+    global resetear
 
+    if iteracion == 1 and resetear:
+        tabsim.clear()
+        tabnum.clear()
+        cuadroplo.clear()
+        resetear = False
+        
     if not logic_result:
         if re.match(r'.*}', linea[0]):
             logic_result = True
@@ -142,12 +150,12 @@ def lexan(linea):
     # Revisa si es una impresión.
     m = re.match(r'^imp\([a-zA-Z0-9\+\s"]*\);', linea[0])
     if m is not None:
-        return imprimir(linea, tabsim)
+        return imprimir(linea, tabsim, iteracion)
 
     # Revisa si es una lectura.
     m = re.match(r'^leer\([a-zA-Z]+[0-9]*\);', linea[0])
     if m is not None:
-        return lectura(linea, tabsim)
+        return lectura(linea, tabsim, iteracion)
 
     # Revisa si es un corchete de cierre.
     m = re.match(r'}', linea[0])
@@ -192,6 +200,7 @@ def asigTabSim(linea, m, it):
                         simb[2] = False
                     else:
                         simb[2] = True
+                    simb[4] = 'NoLectura'
                 else:
                     print("Error, está intentando introducir una bandera a una variable de otro tipo en la línea",
                           linea[1])
@@ -200,6 +209,7 @@ def asigTabSim(linea, m, it):
                 for simb1 in tabsim:
                     if m.group(2) == simb1[0]:
                         simb[2] = simb1[1]
+                        simb[4] = 'NoLectura'
                     else:
                         print("Error, variable no declarada en la linea",
                               linea[1])
@@ -207,6 +217,7 @@ def asigTabSim(linea, m, it):
             elif it == 2:
                 if simb[1] == 'int':
                     simb[2] = int(m.group(2))
+                    simb[4] = 'NoLectura'
                 else:
                     print("Error, está intentando introducir un entero a una variable de otro tipo en la línea",
                           linea[1])
@@ -214,6 +225,7 @@ def asigTabSim(linea, m, it):
             elif it == 3:
                 if simb[1] == 'str':
                     simb[2] = m.group(2)
+                    simb[4] = 'NoLectura'
                 else:
                     print("Error, está intentando introducir una cadena a una variable de otro tipo en la línea",
                           linea[1])
@@ -845,18 +857,12 @@ def reemplazar_operadores_logicos(expresion):
     return expresion
 
 
-def imprimir(linea, tabsim):
+def imprimir(linea, tabsim, iteracion):
     flag = False
     expresion = re.sub(r'^imp\(', '', linea[0])
     expresion = re.sub(r'\);}*', '', expresion)
-    cadenas = re.findall(r'".*"', expresion)
-    cadenas = [el for el in cadenas if el]
     variables_en_linea = re.findall(r'".*"|([^+\s]*)', expresion)
     variables_en_linea = [el for el in variables_en_linea if el]
-
-    for cadena in cadenas:
-        cadena = re.sub(r'"', '',  cadena)
-        strings.append(cadena)
 
     for variable in variables_en_linea:
         flag = True
@@ -870,12 +876,18 @@ def imprimir(linea, tabsim):
             print("Error en la linea", linea[1], ", la variable", variable, "no está declarada")
             return False
         
-    print("Analisis de impresión en la linea", linea[1], "correcto, esperando impresión")
+
+    if iteracion == 1:
+        todo = re.findall(r'".*"|[^+\s]*', expresion)
+        todo = [el for el in todo if el]
+        cadenas = re.findall(r'".*"', expresion)
+        cadenas = [el for el in cadenas if el]
+        copy.copiarImpresion(cadenas, todo)
     return True
 
 
-def lectura(linea, tabsim):
-    flag = False
+def lectura(linea, tabsim, iteracion):
+    flag = True
     expresion = re.sub(r'^leer\(', '', linea[0])
     expresion = re.sub(r'\);}*', '', expresion)
 
@@ -891,5 +903,7 @@ def lectura(linea, tabsim):
         return False
     
 
-    print("Analisis de lectura en la linea", linea[1], "correcto, esperando lectura")
+
+    if iteracion == 1:
+        copy.copiarLectura(expresion)
     return True
