@@ -136,32 +136,43 @@ def copiarCuadroplo(cuadroplo):
                             flag = True
                             break
                     if not flag:
-                        output.write("        " + cuadroplo[3] + " DB ?\n")
+                        output.write("        " + cuadroplo[3] + " DW ?\n")
                         variables_temporales.append(cuadroplo[3])
                 if linea == "        ;Codigo.":
                     match cuadroplo[0]:
                         case '+':
-                            output.write('        lea AX, ' + str(cuadroplo[1]) + '\n')
-                            output.write('        lea BX, ' + str(cuadroplo[2]) + '\n')
-                            output.write('        add AX, BX\n')
-                            output.write('        mov ' + cuadroplo[3] + ', AX\n')
+                            output.write('        xor ax, ax\n')
+                            output.write('        xor bx, bx\n')
+                            output.write('        mov ax, ' + str(cuadroplo[1]) + '\n')
+                            output.write('        mov bx, ' + str(cuadroplo[2]) + '\n')
+                            output.write('        add ax, bx\n')
+                            output.write('        mov ' + cuadroplo[3] + ', ax\n')
+                            output.write('        \n')
                         case '-':
-                            output.write('        lea AX, ' + str(cuadroplo[1]) + '\n')
-                            output.write('        lea BX, ' + str(cuadroplo[2]) + '\n')
-                            output.write('        sub AX, BX\n')
-                            output.write('        mov ' + cuadroplo[3] + ', AX\n')
+                            output.write('        xor ax, ax\n')
+                            output.write('        xor bx, bx\n')
+                            output.write('        mov ax, ' + str(cuadroplo[1]) + '\n')
+                            output.write('        mov bx, ' + str(cuadroplo[2]) + '\n')
+                            output.write('        sub ax, bx\n')
+                            output.write('        mov ' + cuadroplo[3] + ', ax\n')
+                            output.write('        \n')
                         case '*':
-                            output.write('        mov AH, 0\n')
-                            output.write('        lea AL, ' + str(cuadroplo[1]) + '\n')
-                            output.write('        lea BL, ' + str(cuadroplo[2]) + '\n')
-                            output.write('        mul BL\n')
-                            output.write('        mov ' + cuadroplo[3] + ', AL\n')
+                            output.write('        xor ax, ax\n')
+                            output.write('        xor bx, bx\n')
+                            output.write('        mov ax, ' + str(cuadroplo[1]) + '\n')
+                            output.write('        mov bx, ' + str(cuadroplo[2]) + '\n')
+                            output.write('        mul bx\n')
+                            output.write('        mov ' + cuadroplo[3] + ', ax\n')
+                            output.write('        \n')
                         case '/':
-                            output.write('        mov AH, 0\n')
-                            output.write('        lea AL, ' + str(cuadroplo[1]) + '\n')
-                            output.write('        lea BL, ' + str(cuadroplo[2]) + '\n')
-                            output.write('        div BL\n')
-                            output.write('        mov ' + cuadroplo[3] + ', AL\n')
+                            output.write('        xor ax, ax\n')
+                            output.write('        xor bx, bx\n')
+                            output.write('        xor dx, dx\n')
+                            output.write('        mov ax, ' + str(cuadroplo[1]) + '\n')
+                            output.write('        mov bx, ' + str(cuadroplo[2]) + '\n')
+                            output.write('        div bx\n')
+                            output.write('        mov ' + cuadroplo[3] + ', ax\n')
+                            output.write('        \n')
                 output.write(linea + '\n') 
                     
 
@@ -171,8 +182,11 @@ def copiarResultadoSintactico(variable, resultado):
         with open('Patito.ASM', 'w') as output:
             for linea in txt:
                 if linea == "        ;Codigo.":
-                    output.write('        mov ' + variable + ', ' + str(resultado) + '\n')
-                output.write(linea + '\n') 
+                    output.write('        xor ax, ax\n')
+                    output.write('        mov ax, '+resultado+'\n')
+                    output.write('        mov ' + variable + ', ax\n')
+                    output.write('\n')
+                output.write(linea + '\n')
 
 
 def copiarAsignacion(variable, valor):

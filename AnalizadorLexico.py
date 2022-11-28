@@ -30,6 +30,7 @@ logic_result = True
 operacion_en_comparacion = False
 error = False
 resetear = True
+ultimaT = '4T'
 
 
 def ispalres(pal, declarar):
@@ -41,6 +42,7 @@ def ispalres(pal, declarar):
 def lexan(linea, iteracion):
     global logic_result
     global resetear
+    global ultimaT
 
     if iteracion == 1 and resetear:
         tabsim.clear()
@@ -105,7 +107,7 @@ def lexan(linea, iteracion):
             return False
         if (syntactic_analyzer(linea, tabsim, iteracion)):
             if iteracion == 1:
-                copy.copiarResultadoSintactico(m.group(2), syntax_result)
+                copy.copiarResultadoSintactico(m.group(2), ultimaT)
             # tabsim.append([m.group(2), 'int', syntax_result, 'id' + str(len(tabsim)), 'NoLectura'])
             return True
 
@@ -320,6 +322,9 @@ def asDeVarTabSim(linea, m):
 
 # Analiíza que la línea sea sintacticamente correcta.
 def syntactic_analyzer(linea, tabsim, iteracion):
+
+    global ultimaT
+
     if not operacion_en_comparacion:
         cuadroplo.clear()
     # Recibe una lista con la línea y su numero de línea ['linea (string)', numero de linea (int)].
@@ -437,6 +442,7 @@ def syntactic_analyzer(linea, tabsim, iteracion):
                 if not operacion_en_comparacion:
                     # Limpia la tabla de números para la siguiente operación.
                     tabnum.clear()
+                    ultimaT = 't' + str(len(cuadroplo))
                     # Imprime la tabla de cuadruplos.
                     print(cuadroplo)
                 return True
@@ -803,17 +809,17 @@ def buscar_tokens(variables_en_linea, tabsim, numero_linea, expresion):
     variable_no_declarada = False
     contador_no_declaradas = 0
     variables_lectura = []
-    for variable in variables_en_linea:
-        for simb in tabsim:
-            if variable == simb[0]:
-                if simb[4] == 'SiLectura':
-                    variables_lectura.append(variable)
-                variable_no_declarada = False
-                break
-            else:
-                variable_no_declarada = True
-        if variable_no_declarada:
-            contador_no_declaradas += 1
+    # for variable in variables_en_linea:
+    #     for simb in tabsim:
+    #         if variable == simb[0]:
+    #             if simb[4] == 'SiLectura':
+    #                 variables_lectura.append(variable)
+    #             variable_no_declarada = False
+    #             break
+    #         else:
+    #             variable_no_declarada = True
+    #     if variable_no_declarada:
+    #         contador_no_declaradas += 1
     if len(variables_lectura) > 0:
         print("Error en linea", str(numero_linea) + ", esperando lectura de las siguientes variables:",
               variables_lectura)

@@ -1,7 +1,10 @@
-int x = 10;
-int y = 20;
+int x = 2;
+int y = 10;
+int nueva;
 int z;
-str pais;
+z = y/x;
+imp(z);
 leer(z);
-z = 20;
-imp(z + " veces campeao do mundo");
+imp("Serbia " + z + " veces campeao do mundo");
+nueva=z*2+(5+8-2);
+imp(nueva);

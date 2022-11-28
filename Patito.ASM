@@ -5,12 +5,17 @@ extra segment para public 'data'
 
 extra ends
 datos segment para public 'data'
-        x DW 10
-        y DW 20
+        x DW 2
+        y DW 10
+        nueva DW 0
         z DW 0
-        pais db 20,?,20 dup(?)
         numerolectura db 6,?,6 dup(?)
-        str1 DB " veces campeao do mundo", "$"
+        t1 DW ?
+        str1 DB "Serbia ", "$"
+        str2 DB " veces campeao do mundo", "$"
+        t2 DW ?
+        t3 DW ?
+        t4 DW ?
         ;Cadenas a imprimir.
 datos ends
 codigo  segment para public 'code'
@@ -24,6 +29,23 @@ p0      proc far
         mov ds, ax
         mov ax, extra
         mov es, ax
+
+        xor ax, ax
+        xor bx, bx
+        xor dx, dx
+        mov ax, y
+        mov bx, x
+        div bx
+        mov t1, ax
+        
+        xor ax, ax
+        mov ax, t1
+        mov z, ax
+
+        mov AX, z
+        push AX
+        call todec
+        pop ax
 
         lea dx, numeroLectura
         mov ah, 0ah
@@ -64,15 +86,55 @@ p0      proc far
         mov AH,2
         int 21h
 
-        mov z, 20
+        mov dx, offset str1
+        mov ah, 9
+        int 21h
+
         mov AX, z
         push AX
         call todec
         pop ax
 
-        mov dx, offset str1
+        mov dx, offset str2
         mov ah, 9
         int 21h
+
+        xor ax, ax
+        xor bx, bx
+        mov ax, z
+        mov bx, 2
+        mul bx
+        mov t1, ax
+        
+        xor ax, ax
+        xor bx, bx
+        mov ax, 5
+        mov bx, 8
+        add ax, bx
+        mov t2, ax
+        
+        xor ax, ax
+        xor bx, bx
+        mov ax, t2
+        mov bx, 2
+        sub ax, bx
+        mov t3, ax
+        
+        xor ax, ax
+        xor bx, bx
+        mov ax, t1
+        mov bx, t3
+        add ax, bx
+        mov t4, ax
+        
+        xor ax, ax
+        mov ax, t4
+        mov nueva, ax
+
+        mov AX, nueva
+        push AX
+        call todec
+        pop ax
 
         ;Codigo.
 
@@ -148,6 +210,14 @@ todec endp
 
 codigo  ends
         end p0
+
+
+
+
+
+
+
+
 
 
 
