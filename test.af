@@ -1,5 +1,7 @@
 int x = 10;
 int y = 20;
+int z;
 str pais;
-leer(pais);
-imp(pais + x + " veces campeao do mundo");
+leer(z);
+z = 20;
+imp(z + " veces campeao do mundo");

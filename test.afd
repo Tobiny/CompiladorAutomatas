@@ -1,5 +1,7 @@
 1: int x = 10;
 2: int y = 20;
-3: str pais;
-4: leer(pais);
-5: imp(pais + x + " veces campeao do mundo");
+3: int z;
+4: str pais;
+5: leer(z);
+6: z = 20;
+7: imp(z + " veces campeao do mundo");

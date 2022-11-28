@@ -69,7 +69,7 @@ def lexan(linea, iteracion):
                 print('No puede asignar el valor a las palabras reservadas, error en la linea', linea[1])
                 return False
             else:
-                return asigTabSim(linea, m, a)
+                return asigTabSim(linea, m, a, iteracion)
 
     for a in range(0, len(declaraAsigna)):
         m = declaraAsigna[a].match(linea[0])
@@ -106,7 +106,7 @@ def lexan(linea, iteracion):
         if (syntactic_analyzer(linea, tabsim, iteracion)):
             if iteracion == 1:
                 copy.copiarResultadoSintactico(m.group(2), syntax_result)
-            tabsim.append([m.group(2), 'int', syntax_result, 'id' + str(len(tabsim)), 'NoLectura'])
+            # tabsim.append([m.group(2), 'int', syntax_result, 'id' + str(len(tabsim)), 'NoLectura'])
             return True
 
     m = re.match(r'^([a-zA-Z]+[0-9]*)\s*=.*([+|\-|*|\/|\(|\)])+.*(;)', linea[0])
@@ -130,8 +130,8 @@ def lexan(linea, iteracion):
                         for _ in range(len(cuadroplo)):
                             if _ == len(cuadroplo) - 1:
                                 copy.copiarResultadoSintactico(m.group(1), cuadroplo[_][3])
-                    variable[2] = syntax_result
-                    variable[4] = 'NoLectura'
+                    # variable[2] = syntax_result
+                    # variable[4] = 'NoLectura'
                     break
             return True
         else:
@@ -189,18 +189,21 @@ def addTabSim(linea, m):
         return True
 
 
-def asigTabSim(linea, m, it):
+def asigTabSim(linea, m, it, iteracion):
     declarada = False
+    valor = m.group(2)
+    valor = int(valor)
     for simb in tabsim:
         if m.group(1) == simb[0]:
             declarada = True
             if it == 0:
                 if simb[1] == 'boolean':
                     if m.group(2) == 'False':
-                        simb[2] = False
+                        if iteracion == 1:
+                            copy.copiarAsignacion(simb[0], valor)
                     else:
-                        simb[2] = True
-                    simb[4] = 'NoLectura'
+                        if iteracion == 1:
+                            copy.copiarAsignacion(simb[0], valor)
                 else:
                     print("Error, está intentando introducir una bandera a una variable de otro tipo en la línea",
                           linea[1])
@@ -208,24 +211,24 @@ def asigTabSim(linea, m, it):
             elif it == 1:
                 for simb1 in tabsim:
                     if m.group(2) == simb1[0]:
-                        simb[2] = simb1[1]
-                        simb[4] = 'NoLectura'
+                        if iteracion == 1:
+                            copy.copiarAsignacion(simb[0], valor)
                     else:
                         print("Error, variable no declarada en la linea",
                               linea[1])
                         return False
             elif it == 2:
                 if simb[1] == 'int':
-                    simb[2] = int(m.group(2))
-                    simb[4] = 'NoLectura'
+                    if iteracion == 1:
+                        copy.copiarAsignacion(simb[0], valor)
                 else:
                     print("Error, está intentando introducir un entero a una variable de otro tipo en la línea",
                           linea[1])
                     return False
             elif it == 3:
                 if simb[1] == 'str':
-                    simb[2] = m.group(2)
-                    simb[4] = 'NoLectura'
+                    if iteracion == 1:
+                        copy.copiarAsignacion(simb[0], valor)
                 else:
                     print("Error, está intentando introducir una cadena a una variable de otro tipo en la línea",
                           linea[1])
@@ -914,5 +917,5 @@ def lectura(linea, tabsim, iteracion):
         return False
 
     if iteracion == 1:
-        copy.copiarLectura(expresion)
+        copy.copiarLectura(expresion, tabsim)
     return True

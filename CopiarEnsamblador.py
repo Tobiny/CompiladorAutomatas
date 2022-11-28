@@ -50,44 +50,77 @@ def copiarImpresion(cadenas, todo, tabsim):
                         if not flag:
                             for simbolo in tabsim:
                                 if elemento == simbolo[0]:
-                                    if simbolo[4] == "SiLectura":
-                                        output.write('        xor bx, bx\n')
-                                        output.write('        mov bl, '+simbolo[0]+'[1]\n')
-                                        output.write('        mov '+simbolo[0]+'[bx+2], \'$\'\n')
-                                        output.write('        mov dx, offset '+simbolo[0]+' + 2\n')
+                                    if simbolo[1] == "int":
+                                        output.write("        mov AX, "+simbolo[0]+"\n")
+                                        output.write("        push AX\n")
+                                        output.write("        call todec\n")
+                                        output.write("        pop ax\n")
+                                    elif simbolo[1] == "str":
+                                        output.write('        mov dx, offset ' + elemento + '\n')
                                         output.write('        mov ah, 9\n')
                                         output.write('        int 21h\n')
-                                    else:
-                                        contImpDec = 0
-                                        if simbolo[1] == "int":
-                                            output.write("        mov AX, "+simbolo[0]+"\n")
-                                            output.write("        push AX\n")
-                                            output.write("        call todec\n")
-                                            output.write("        pop ax\n")
-
-                                        elif simbolo[1] == "str":
-                                            output.write('        mov dx, offset ' + elemento + '\n')
-                                            output.write('        mov ah, 9\n')
-                                            output.write('        int 21h\n')
                                     output.write('\n')
                 output.write(linea + '\n') 
 
 
-def copiarLectura(variable):
+def copiarLectura(variable, tabsim):
     with open('Patito.ASM', 'r') as txt:
         txt = txt.read().split('\n')
         with open('Patito.ASM', 'w') as output:
             for linea in txt:
                 if linea == "        ;Codigo.":
-                    output.write('        xor ax, ax\n')
-                    output.write('        xor bx, bx\n')
-                    output.write('        mov dx, offset ' + variable + '\n')
-                    output.write('        mov ah, 0ah\n')
-                    output.write('        int 21h\n')
-                    output.write('        mov dl, 10\n')
-                    output.write('        mov AH,2\n')
-                    output.write('        int 21h\n')
-                    output.write('\n')
+                    for simb in tabsim:
+                        if variable == simb[0]:
+                            if simb[1] == 'str':
+                                output.write('        xor ax, ax\n')
+                                output.write('        xor bx, bx\n')
+                                output.write('        mov dx, offset ' + variable + '\n')
+                                output.write('        mov ah, 0ah\n')
+                                output.write('        int 21h\n')
+                                output.write('        mov dl, 10\n')
+                                output.write('        mov AH,2\n')
+                                output.write('        int 21h\n')
+                                output.write('\n')
+                            elif simb[1] == 'int':
+                                output.write('        lea dx, numeroLectura\n')
+                                output.write('        mov ah, 0ah\n')
+                                output.write('        int 21h\n')
+                                output.write('        lea bx, numeroLectura+1\n')
+                                output.write('        mov ch, 0\n')
+                                output.write('        mov cl, [bx]\n')
+                                output.write('        push cx\n')
+                                output.write('        cr:\n')
+                                output.write('            inc bx\n')
+                                output.write('            mov al, [bx]\n')
+                                output.write('            cmp al, 30h\n')
+                                output.write('            jb fuera\n')
+                                output.write('            cmp al, 39h\n')
+                                output.write('            ja fuera\n')
+                                output.write('            sub [bx], 30h\n')
+                                output.write('            loop cr\n')
+                                output.write('        pop cx\n')
+                                output.write('        dec cx\n')
+                                output.write('        mov si, 0ah\n')
+                                output.write('        lea bx, numeroLectura+2\n')
+                                output.write('        mov al, [bx]\n')
+                                output.write('        mov ah, 0\n')
+                                output.write('        jcxz tp\n')
+                                output.write('        cc:\n')
+                                output.write('            mul si\n')
+                                output.write('            jo fuera\n')
+                                output.write('            inc bx\n')
+                                output.write('            mov dl, [bx]\n')
+                                output.write('            mov dh, 0\n')
+                                output.write('            add ax, dx\n')
+                                output.write('        loop cc\n')
+                                output.write('        tp:\n')
+                                output.write('            jc fuera\n')
+                                output.write('            mov ' + variable + ', ax\n')
+                                output.write('        fuera:\n')
+                                output.write('        mov dl, 10\n')
+                                output.write('        mov AH,2\n')
+                                output.write('        int 21h\n')
+                                output.write('\n')
                 output.write(linea + '\n') 
 
 
@@ -140,3 +173,13 @@ def copiarResultadoSintactico(variable, resultado):
                 if linea == "        ;Codigo.":
                     output.write('        mov ' + variable + ', ' + str(resultado) + '\n')
                 output.write(linea + '\n') 
+
+
+def copiarAsignacion(variable, valor):
+    with open('Patito.ASM', 'r') as txt:
+        txt = txt.read().split('\n')
+        with open('Patito.ASM', 'w') as output:
+            for linea in txt:
+                if linea == "        ;Codigo.":
+                    output.write('        mov ' + variable + ', ' + str(valor) + '\n')
+                output.write(linea + '\n')

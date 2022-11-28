@@ -7,6 +7,7 @@ extra ends
 datos segment para public 'data'
         x DW 10
         y DW 20
+        z DW 0
         pais db 20,?,20 dup(?)
         numerolectura db 6,?,6 dup(?)
         str1 DB " veces campeao do mundo", "$"
@@ -24,23 +25,47 @@ p0      proc far
         mov ax, extra
         mov es, ax
 
-        xor ax, ax
-        xor bx, bx
-        mov dx, offset pais
+        lea dx, numeroLectura
         mov ah, 0ah
         int 21h
+        lea bx, numeroLectura+1
+        mov ch, 0
+        mov cl, [bx]
+        push cx
+        cr:
+            inc bx
+            mov al, [bx]
+            cmp al, 30h
+            jb fuera
+            cmp al, 39h
+            ja fuera
+            sub [bx], 30h
+            loop cr
+        pop cx
+        dec cx
+        mov si, 0ah
+        lea bx, numeroLectura+2
+        mov al, [bx]
+        mov ah, 0
+        jcxz tp
+        cc:
+            mul si
+            jo fuera
+            inc bx
+            mov dl, [bx]
+            mov dh, 0
+            add ax, dx
+        loop cc
+        tp:
+            jc fuera
+            mov z, ax
+        fuera:
         mov dl, 10
         mov AH,2
         int 21h
 
-        xor bx, bx
-        mov bl, pais[1]
-        mov pais[bx+2], '$'
-        mov dx, offset pais + 2
-        mov ah, 9
-        int 21h
-
-        mov AX, x
+        mov z, 20
+        mov AX, z
         push AX
         call todec
         pop ax
@@ -123,6 +148,7 @@ todec endp
 
 codigo  ends
         end p0
+
 
 
 
