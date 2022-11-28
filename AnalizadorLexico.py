@@ -1,15 +1,14 @@
 import re
 import CopiarEnsamblador as copy
 
-
 variables = re.compile(r'^[a-zA-Z]+')
 declaraciones = [re.compile(r'(^str)\s*([a-zA-Z]+[0-9]*)\s*(;$)'),  # Strings
                  re.compile(r'(^int)\s*([a-zA-Z]+[0-9]*)\s*(;$)'),  # Integers
-                 re.compile(r'(^boolean)\s*([a-zA-Z]+[0-9]*)\s*(;$)')]  #Booleanos
+                 re.compile(r'(^boolean)\s*([a-zA-Z]+[0-9]*)\s*(;$)')]  # Booleanos
 
 declaraAsigna = [re.compile(r'(^str)\s*([a-zA-Z]+[0-9]*)\s*=\s*(\"[^\"]*\")\s*(;$)'),  # Strings
                  re.compile(r'(^int)\s*([a-zA-Z]+[0-9]*)\s*=\s*([0-9]+)\s*(;$)'),  # Integers
-                 re.compile(r'(^boolean)\s*([a-zA-Z]+[0-9]*)\s*=\s*(True|False)\s*(;$)')]  #Booleanos
+                 re.compile(r'(^boolean)\s*([a-zA-Z]+[0-9]*)\s*=\s*(True|False)\s*(;$)')]  # Booleanos
 
 declaraAsignaVar = [re.compile(r'(^str)\s*([a-zA-Z]+[0-9]*)\s*=\s*([a-zA-Z]+[0-9]*)\s*(;$)'),
                     re.compile(r'(^int)\s*([a-zA-Z]+[0-9]*)\s*=\s*([a-zA-Z]+[0-9]*)\s*(;$)'),
@@ -40,7 +39,6 @@ def ispalres(pal, declarar):
 
 
 def lexan(linea, iteracion):
-    
     global logic_result
     global resetear
 
@@ -49,7 +47,7 @@ def lexan(linea, iteracion):
         tabnum.clear()
         cuadroplo.clear()
         resetear = False
-        
+
     if not logic_result:
         if re.match(r'.*}', linea[0]):
             logic_result = True
@@ -81,7 +79,7 @@ def lexan(linea, iteracion):
                 return False
             else:
                 return asDeTabSim(linea, m)
-                
+
     for a in range(0, len(declaraAsignaVar)):
         m = declaraAsignaVar[a].match(linea[0])
         if m:
@@ -94,7 +92,7 @@ def lexan(linea, iteracion):
     m = re.match(r'^(int)\s+([a-zA-Z]+[0-9]*)\s*=.*([+|\-|*|\/|\(|\)])+.*(;)', linea[0])
     if m is not None:
         if (m.group(2) in palabras) or (
-        re.match(r'=.*(int|main|boolean|str|readin|print|for|if|while|else).*', linea[0])):
+                re.match(r'=.*(int|main|boolean|str|readin|print|for|if|while|else).*', linea[0])):
             print('No puede declarar variables con palabras reservadas, error en la línea ', linea[1])
             return False
         declarada = False
@@ -108,13 +106,13 @@ def lexan(linea, iteracion):
         if (syntactic_analyzer(linea, tabsim, iteracion)):
             if iteracion == 1:
                 copy.copiarResultadoSintactico(m.group(2), syntax_result)
-            tabsim.append([m.group(2), 'int', syntax_result, 'id' + str(len(tabsim)), 'NoLectura' ])
+            tabsim.append([m.group(2), 'int', syntax_result, 'id' + str(len(tabsim)), 'NoLectura'])
             return True
 
     m = re.match(r'^([a-zA-Z]+[0-9]*)\s*=.*([+|\-|*|\/|\(|\)])+.*(;)', linea[0])
     if m is not None:
-        if(m.group(1) in palabras) or (
-        re.match(r'=.*(int|main|boolean|str|readin|print|for|if|while|else).*', linea[0])):
+        if (m.group(1) in palabras) or (
+                re.match(r'=.*(int|main|boolean|str|readin|print|for|if|while|else).*', linea[0])):
             print('No puede declarar variables con palabras reservadas, error en la línea ', linea[1])
             return False
         declarada = False
@@ -138,7 +136,7 @@ def lexan(linea, iteracion):
             return True
         else:
             return False
-    
+
     # Revisa si es un if.
     m = re.match(r'^if\(.*\){$|^if\(.*\){', linea[0])
     if m is not None:
@@ -163,7 +161,7 @@ def lexan(linea, iteracion):
     m = re.match(r'}', linea[0])
     if m is not None:
         return
-    
+
     # Si no es ninguna opción marca error.
     print("Error, revise la línea", linea[1], "ya que existe un error de sintaxis en la declaración o asignación")
 
@@ -325,14 +323,15 @@ def syntactic_analyzer(linea, tabsim, iteracion):
     numero_linea = linea[1]
     # Elimina lo que viene antes del igual, el punto y coma, y los espacios.
     expresion = re.sub(r'.*= *', '', linea[0]).replace(" ", "")
-    expresion = re.sub(r';$','',expresion)
+    expresion = re.sub(r';$', '', expresion)
     # Almacena todas las variables presentes en la linea.
     variables_en_linea = re.findall(r'[a-zA-Z]+\d*', expresion)
     # Analiza que no sean booleanos o strings.
     for simb in tabsim:
         for var in variables_en_linea:
             if var == simb[0] and (simb[1] == "str" or simb[1] == "boolean"):
-                print("Analisis sintáctico linea " + str(numero_linea) + ": No se puede hacer operaciones con valores boleanos o cadenas.")
+                print("Analisis sintáctico linea " + str(
+                    numero_linea) + ": No se puede hacer operaciones con valores boleanos o cadenas.")
                 return False
     # Almacena todos los números presentes en la línea.
     numeros_en_linea = re.findall(r'\b\d+\b', expresion)
@@ -431,7 +430,7 @@ def syntactic_analyzer(linea, tabsim, iteracion):
                 print("Analisis sintáctico linea " + str(numero_linea) + ": Correcto")
                 # Almacena el resultado final de la operación en la variable global.
                 global syntax_result
-                syntax_result = pilaValores[tope-1]
+                syntax_result = pilaValores[tope - 1]
                 if not operacion_en_comparacion:
                     # Limpia la tabla de números para la siguiente operación.
                     tabnum.clear()
@@ -491,53 +490,53 @@ def syntactic_analyzer(linea, tabsim, iteracion):
                         # Almacena el resultado de la respectiva operación en la penúltima posición de la pila. 
                         match numeroAccion:
                             case 1:
-                                pilaValores[tope-2] += pilaValores[tope-1]
+                                pilaValores[tope - 2] += pilaValores[tope - 1]
                                 add.append("+")
                             case 2:
-                                pilaValores[tope-2] -= pilaValores[tope-1]
+                                pilaValores[tope - 2] -= pilaValores[tope - 1]
                                 add.append("-")
                             case 4:
-                                pilaValores[tope-2] *= pilaValores[tope-1]
+                                pilaValores[tope - 2] *= pilaValores[tope - 1]
                                 add.append("*")
                             case 5:
-                                pilaValores[tope-2] /= pilaValores[tope-1]
+                                pilaValores[tope - 2] /= pilaValores[tope - 1]
                                 add.append("/")
                         # Añade al cuadruplo las variables o los numeros de la operación.
-                        if pilaIdentificadores[tope-2][0] == "i":
+                        if pilaIdentificadores[tope - 2][0] == "i":
                             for simb in tabsim:
-                                if pilaIdentificadores[tope-2] == simb[3]:
+                                if pilaIdentificadores[tope - 2] == simb[3]:
                                     add.append(simb[0])
                                     es_operacion = False
                                     break
                         else:
                             for num in tabnum:
-                                if pilaIdentificadores[tope-2] == num[1]:
+                                if pilaIdentificadores[tope - 2] == num[1]:
                                     add.append(num[0])
                                     es_operacion = False
                                     break
                         if es_operacion:
-                            add.append(pilaIdentificadores[tope-2])
+                            add.append(pilaIdentificadores[tope - 2])
                         es_operacion = True
-                        if pilaIdentificadores[tope-1][0] == "i":
+                        if pilaIdentificadores[tope - 1][0] == "i":
                             for simb in tabsim:
-                                if pilaIdentificadores[tope-1] == simb[3]:
+                                if pilaIdentificadores[tope - 1] == simb[3]:
                                     add.append(simb[0])
                                     es_operacion = False
                                     break
                         else:
                             for num in tabnum:
-                                if pilaIdentificadores[tope-1] == num[1]:
+                                if pilaIdentificadores[tope - 1] == num[1]:
                                     add.append(num[0])
                                     es_operacion = False
                                     break
-                        if es_operacion:  
-                            add.append(pilaIdentificadores[tope-1])
+                        if es_operacion:
+                            add.append(pilaIdentificadores[tope - 1])
                         es_operacion = True
-                        add.append('t' + str(len(cuadroplo)+1))
+                        add.append('t' + str(len(cuadroplo) + 1))
                         if iteracion == 1:
                             copy.copiarCuadroplo(add)
                         cuadroplo.append(add)
-                        pilaIdentificadores[tope-2] = add[3]
+                        pilaIdentificadores[tope - 2] = add[3]
                         pilaIdentificadores.pop()
                         # Saca el último valor de la pila dejando en el tope el resultado de la operación.
                         pilaValores.pop()
@@ -605,14 +604,16 @@ def logic_analyzer(linea, tabsim, iteracion):
             ["E", ("R", 9), ("R", 9), ("R", 9), ("R", 9), ("R", 9), ("R", 9), "E", "E", ("R", 9), ("R", 9)],  # 4
             [("D", 7), "E", "E", "E", "E", "E", "E", ("D", 5), ("D", 6), "E", "E"],  # 5
             [("D", 7), "E", "E", "E", "E", "E", "E", ("D", 5), ("D", 6), "E", "E"],  # 6
-            ["E", ("R", 12), ("R", 12), ("R", 12), ("R", 12), ("R", 12), ("R", 12), "E", "E", ("R", 12), ("R", 12)],  # 7
+            ["E", ("R", 12), ("R", 12), ("R", 12), ("R", 12), ("R", 12), ("R", 12), "E", "E", ("R", 12), ("R", 12)],
+            # 7
             [("D", 7), "E", "E", "E", "E", "E", "E", ("D", 5), ("D", 6), "E", "E"],  # 8
             [("D", 7), "E", "E", "E", "E", "E", "E", ("D", 5), ("D", 6), "E", "E"],  # 9
             [("D", 7), "E", "E", "E", "E", "E", "E", ("D", 5), ("D", 6), "E", "E"],  # 10
             [("D", 7), "E", "E", "E", "E", "E", "E", ("D", 5), ("D", 7), "E", "E"],  # 11
             [("D", 7), "E", "E", "E", "E", "E", "E", ("D", 5), ("D", 7), "E", "E"],  # 12
             [("D", 7), "E", "E", "E", "E", "E", "E", ("D", 5), ("D", 7), "E", "E"],  # 13
-            ["E", ("R", 10), ("R", 10), ("R", 10), ("R", 10), ("R", 10), ("R", 10), "E", "E", ("R", 10), ("R", 10)],  # 14
+            ["E", ("R", 10), ("R", 10), ("R", 10), ("R", 10), ("R", 10), ("R", 10), "E", "E", ("R", 10), ("R", 10)],
+            # 14
             ["E", ("D", 8), ("D", 9), "E", "E", "E", "E", "E", "E", ("D", 22), "E"],  # 15
             ["E", ("R", 1), ("R", 1), ("D", 10), ("D", 11), "E", "E", "E", "E", ("R", 1), ("R", 1)],  # 16
             ["E", ("R", 2), ("R", 2), ("D", 10), ("D", 11), "E", "E", "E", "E", ("R", 2), ("R", 2)],  # 17
@@ -620,7 +621,8 @@ def logic_analyzer(linea, tabsim, iteracion):
             ["E", ("R", 5), ("R", 5), ("R", 5), ("R", 5), ("D", 12), ("D", 13), "E", "E", ("R", 5), ("R", 5)],  # 19
             ["E", ("R", 7), ("R", 7), ("R", 7), ("R", 7), ("R", 7), ("R", 7), "E", "E", ("R", 7), ("R", 7)],  # 20
             ["E", ("R", 8), ("R", 8), ("R", 8), ("R", 8), ("R", 8), ("R", 8), "E", "E", ("R", 8), ("R", 8)],  # 21
-            ["E", ("R", 11), ("R", 11), ("R", 11), ("R", 11), ("R", 11), ("R", 11), "E", "E", ("R", 11), ("R", 11)]]  # 22
+            ["E", ("R", 11), ("R", 11), ("R", 11), ("R", 11), ("R", 11), ("R", 11), "E", "E", ("R", 11),
+             ("R", 11)]]  # 22
         IR_A = [
             [1, 2, 3, 4],  # 0
             ["E", "E", "E", "E"],  # 1
@@ -644,7 +646,7 @@ def logic_analyzer(linea, tabsim, iteracion):
             ["E", "E", "E", "E"],  # 19
             ["E", "E", "E", "E"],  # 20
             ["E", "E", "E", "E"],  # 21
-            ["E", "E", "E", "E"]]    # 22
+            ["E", "E", "E", "E"]]  # 22
 
         sacarsimbolos = {1: 3, 2: 3, 3: 1, 4: 3, 5: 3, 6: 1, 7: 3, 8: 3, 9: 1, 10: 2, 11: 3, 12: 1}
         producciones_primer_simbolo = {1: 0, 2: 0, 3: 0, 4: 1, 5: 1, 6: 1, 7: 2, 8: 2, 9: 2, 10: 3, 11: 3, 12: 3}
@@ -673,7 +675,7 @@ def logic_analyzer(linea, tabsim, iteracion):
             if ACCION[x][y] == "A":
                 print("Analisis lógico linea " + str(numero_linea) + ": Correcto")
                 global logic_result
-                logic_result = pilaValores[tope-1]
+                logic_result = pilaValores[tope - 1]
                 print("Comparación", logic_result)
                 tabnum.clear()
                 print(cuadroplo)
@@ -720,70 +722,71 @@ def logic_analyzer(linea, tabsim, iteracion):
                         # Almacena el resultado de la respectiva operación en la penúltima posición de la pila. 
                         match numeroAccion:
                             case 1:
-                                pilaValores[tope-2] = pilaValores[tope-2] or pilaValores[tope-1]
+                                pilaValores[tope - 2] = pilaValores[tope - 2] or pilaValores[tope - 1]
                                 add.append("/&")
                             case 2:
-                                pilaValores[tope-2] = pilaValores[tope-2] and pilaValores[tope-1]
+                                pilaValores[tope - 2] = pilaValores[tope - 2] and pilaValores[tope - 1]
                                 add.append("&&")
                             case 4:
-                                pilaValores[tope-2] = pilaValores[tope-2] == pilaValores[tope-1]
+                                pilaValores[tope - 2] = pilaValores[tope - 2] == pilaValores[tope - 1]
                                 add.append("==")
                             case 5:
-                                pilaValores[tope-2] = pilaValores[tope-2] != pilaValores[tope-1]
+                                pilaValores[tope - 2] = pilaValores[tope - 2] != pilaValores[tope - 1]
                                 add.append("!=")
                             case 7:
-                                pilaValores[tope-2] = pilaValores[tope-2] > pilaValores[tope-1]
+                                pilaValores[tope - 2] = pilaValores[tope - 2] > pilaValores[tope - 1]
                                 add.append(">")
                             case 8:
-                                pilaValores[tope-2] = pilaValores[tope-2] < pilaValores[tope-1]
+                                pilaValores[tope - 2] = pilaValores[tope - 2] < pilaValores[tope - 1]
                                 add.append("<")
                             case 10:
-                                if isinstance(pilaValores[tope-1], int) or isinstance(pilaValores[tope-1], str):
-                                    print("Analisis lógico linea " + str(numero_linea) + ": Solo se pueden negar variables boleanas.")
+                                if isinstance(pilaValores[tope - 1], int) or isinstance(pilaValores[tope - 1], str):
+                                    print("Analisis lógico linea " + str(
+                                        numero_linea) + ": Solo se pueden negar variables boleanas.")
                                     logic_result = False
                                     return False
-                                pilaValores[tope-1] = not pilaValores[tope-1]
+                                pilaValores[tope - 1] = not pilaValores[tope - 1]
                                 add.append("!")
                                 es_negacion = True
                         # Añade al cuadruplo las variables o los numeros de la operación.
-                        if pilaIdentificadores[tope-2][0] == "i":
+                        if pilaIdentificadores[tope - 2][0] == "i":
                             for simb in tabsim:
                                 if es_negacion:
-                                    if pilaIdentificadores[tope-1] == simb[3]:
+                                    if pilaIdentificadores[tope - 1] == simb[3]:
                                         add.append(simb[0])
                                         break
                                 else:
-                                    if pilaIdentificadores[tope-2] == simb[3]:
+                                    if pilaIdentificadores[tope - 2] == simb[3]:
                                         add.append(simb[0])
                                         break
-                        elif pilaIdentificadores[tope-2][0] == "n":
+                        elif pilaIdentificadores[tope - 2][0] == "n":
                             for num in tabnum:
-                                if pilaIdentificadores[tope-2] == num[1]:
+                                if pilaIdentificadores[tope - 2] == num[1]:
                                     add.append(num[0])
                                     break
                         else:
-                            add.append(pilaIdentificadores[tope-2])
+                            add.append(pilaIdentificadores[tope - 2])
                         if es_negacion:
                             add.append('')
                         else:
-                            if pilaIdentificadores[tope-1][0] == "i":
+                            if pilaIdentificadores[tope - 1][0] == "i":
                                 for simb in tabsim:
-                                    if pilaIdentificadores[tope-1] == simb[3]:
+                                    if pilaIdentificadores[tope - 1] == simb[3]:
                                         add.append(simb[0])
                                         break
-                            elif pilaIdentificadores[tope-1][0] == "n":
+                            elif pilaIdentificadores[tope - 1][0] == "n":
                                 for num in tabnum:
-                                    if pilaIdentificadores[tope-1] == num[1]:
+                                    if pilaIdentificadores[tope - 1] == num[1]:
                                         add.append(num[0])
                                         break
                             else:
-                                add.append(pilaIdentificadores[tope-1])
-                        add.append('t' + str(len(cuadroplo)+1))
+                                add.append(pilaIdentificadores[tope - 1])
+                        add.append('t' + str(len(cuadroplo) + 1))
                         cuadroplo.append(add)
                         if es_negacion:
-                            pilaIdentificadores[tope-2] = add[3]
+                            pilaIdentificadores[tope - 2] = add[3]
                         else:
-                            pilaIdentificadores[tope-1] = add[3]
+                            pilaIdentificadores[tope - 1] = add[3]
                         es_negacion = False
                         # Saca el último valor de la pila dejando en el tope el resultado de la operación.
                         if numeroAccion != 10:
@@ -809,7 +812,8 @@ def buscar_tokens(variables_en_linea, tabsim, numero_linea, expresion):
         if variable_no_declarada:
             contador_no_declaradas += 1
     if len(variables_lectura) > 0:
-        print("Error en linea", str(numero_linea) + ", esperando lectura de las siguientes variables:", variables_lectura)
+        print("Error en linea", str(numero_linea) + ", esperando lectura de las siguientes variables:",
+              variables_lectura)
         return False
     if contador_no_declaradas <= 0:
         if len(re.sub('[^(]', '', expresion)) != len(re.sub('[^)]', '', expresion)):
@@ -847,7 +851,7 @@ def reemplazar_variables(expresion):
                 expresion = expresion.replace(variable, simb[3])
                 break
     # Regresa la expresión ahora con los id's en lugar de las variables y números.
-    return expresion 
+    return expresion
 
 
 def reemplazar_operadores_logicos(expresion):
@@ -880,14 +884,16 @@ def imprimir(linea, tabsim, iteracion):
         if not flag:
             print("Error en la linea", linea[1], ", la variable", variable, "no está declarada")
             return False
-        
 
     if iteracion == 1:
-        todo = re.findall(r'".*"|[^+\s]*', expresion)
+        todo = re.findall(r'".*?"|[^+\s]*', expresion)
         todo = [el for el in todo if el]
-        cadenas = re.findall(r'".*"', expresion)
+        for _ in range(len(todo)):
+            todo[_] = re.sub('"', '', todo[_])
+
+        cadenas = re.findall(r'"(.*?)"', expresion)
         cadenas = [el for el in cadenas if el]
-        copy.copiarImpresion(cadenas, todo)
+        copy.copiarImpresion(cadenas, todo, tabsim)
     return True
 
 
@@ -906,8 +912,6 @@ def lectura(linea, tabsim, iteracion):
     if not flag:
         print("Error en la linea", linea[1], ", la variable", expresion, "no está declarada")
         return False
-    
-
 
     if iteracion == 1:
         copy.copiarLectura(expresion)

@@ -1,5 +1,3 @@
-extern imprimir:far
-extern leer:far
 pila segment para stack 'stack'
         DB 500 dup (?)
 pila ends
@@ -9,11 +7,11 @@ extra ends
 datos segment para public 'data'
         x DB 10
         y DB 20
-        z DB 30
+        z DB 0
         a DB 0
-        cad DB 6,?,6 dup(?)
-        str1 DB "Mundo", 0
-        t1 DB ?
+        pais db 20,?,20 dup(?)
+        cad DB "Brasil ", "$"
+        str1 DB " veces campeao do Mundo", "$"
         ;Cadenas a imprimir.
 datos ends
 codigo  segment para public 'code'
@@ -28,17 +26,26 @@ p0      proc far
         mov ax, extra
         mov es, ax
 
-        lea si, cad
-        call imprimir
-        lea si, str1
-        call imprimir
-        mov AX, x
-        mov BX, y
-        add AX, BX
-        mov t1, AX
-        mov z, t1
-        lea si, z
-        call imprimir
+        xor ax, ax
+        xor bx, bx
+        mov dx, offset pais
+        mov ah, 0ah
+        int 21h
+        mov dl, 10
+        mov AH,2
+        int 21h
+
+        xor bx, bx
+        mov bl, pais[1]
+        mov pais[bx+2], '$'
+        mov dx, offset pais + 2
+        mov ah, 9
+        int 21h
+
+        mov dx, offset str1
+        mov ah, 9
+        int 21h
+
         ;Codigo.
 
 
@@ -47,8 +54,6 @@ p0      endp
 
 codigo  ends
         end p0
-
-
 
 
 

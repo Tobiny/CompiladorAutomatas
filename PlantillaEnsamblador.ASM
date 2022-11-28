@@ -1,5 +1,3 @@
-extern imprimir:far
-extern leer:far
 pila segment para stack 'stack'
         DB 500 dup (?)
 pila ends

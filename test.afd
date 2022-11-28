@@ -2,7 +2,7 @@
 2: int y = 20;
 3: int z;
 4: int a;
-5: str cad = "Hola";
-6: imp(cad + "Mundo");
-8: z = x + y;
-9: imp(z);
+5: str pais;
+6: leer(pais);
+7: str cad = "Brasil ";
+8: imp(pais + " veces campeao do Mundo");
