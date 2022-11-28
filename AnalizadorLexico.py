@@ -62,8 +62,7 @@ def lexan(linea, iteracion):
                 print('No puede declarar variables con palabras reservadas, error en la línea ', linea[1])
                 return False
             else:
-                addTabSim(linea, m)
-                return True
+                return addTabSim(linea, m)
 
     for a in range(0, len(asignaciones)):
         m = asignaciones[a].match(linea[0])
@@ -72,8 +71,7 @@ def lexan(linea, iteracion):
                 print('No puede asignar el valor a las palabras reservadas, error en la linea', linea[1])
                 return False
             else:
-                asigTabSim(linea, m, a)
-                return True
+                return asigTabSim(linea, m, a)
 
     for a in range(0, len(declaraAsigna)):
         m = declaraAsigna[a].match(linea[0])
@@ -82,8 +80,7 @@ def lexan(linea, iteracion):
                 print('No puede declarar variables con palabras reservadas, error en la línea', linea[1])
                 return False
             else:
-                asDeTabSim(linea, m)
-                return True
+                return asDeTabSim(linea, m)
                 
     for a in range(0, len(declaraAsignaVar)):
         m = declaraAsignaVar[a].match(linea[0])
@@ -92,8 +89,7 @@ def lexan(linea, iteracion):
                 print('No puede declarar variables con palabras reservadas, error en la línea', linea[1])
                 return False
             else:
-                asDeVarTabSim(linea, m)
-                return True
+                return asDeVarTabSim(linea, m)
 
     m = re.match(r'^(int)\s+([a-zA-Z]+[0-9]*)\s*=.*([+|\-|*|\/|\(|\)])+.*(;)', linea[0])
     if m is not None:
@@ -109,8 +105,10 @@ def lexan(linea, iteracion):
         if declarada:
             print('Error, variable ya declarada, en la línea', linea[1])
             return False
-        if (syntactic_analyzer(linea, tabsim)):
-            tabsim.append([m.group(2), 'int', syntax_result, 'id' + str(len(tabsim), 'NoLectura' )])
+        if (syntactic_analyzer(linea, tabsim, iteracion)):
+            if iteracion == 1:
+                copy.copiarResultadoSintactico(m.group(2), syntax_result)
+            tabsim.append([m.group(2), 'int', syntax_result, 'id' + str(len(tabsim)), 'NoLectura' ])
             return True
 
     m = re.match(r'^([a-zA-Z]+[0-9]*)\s*=.*([+|\-|*|\/|\(|\)])+.*(;)', linea[0])
@@ -127,9 +125,13 @@ def lexan(linea, iteracion):
         if not declarada:
             print('Error, variable no declarada, en la línea', linea[1])
             return False
-        if (syntactic_analyzer(linea, tabsim)):
+        if (syntactic_analyzer(linea, tabsim, iteracion)):
             for variable in tabsim:
                 if m.group(1) == variable[0]:
+                    if iteracion == 1:
+                        for _ in range(len(cuadroplo)):
+                            if _ == len(cuadroplo) - 1:
+                                copy.copiarResultadoSintactico(m.group(1), cuadroplo[_][3])
                     variable[2] = syntax_result
                     variable[4] = 'NoLectura'
                     break
@@ -140,12 +142,12 @@ def lexan(linea, iteracion):
     # Revisa si es un if.
     m = re.match(r'^if\(.*\){$|^if\(.*\){', linea[0])
     if m is not None:
-        return logic_analyzer(linea, tabsim)
+        return logic_analyzer(linea, tabsim, iteracion)
 
     # Revisa si es un while.
     m = re.match(r'^while\(.*\){$|^while\(.*\){', linea[0])
     if m is not None:
-        return logic_analyzer(linea, tabsim)
+        return logic_analyzer(linea, tabsim, iteracion)
 
     # Revisa si es una impresión.
     m = re.match(r'^imp\([a-zA-Z0-9\+\s"]*\);', linea[0])
@@ -230,6 +232,7 @@ def asigTabSim(linea, m, it):
                     print("Error, está intentando introducir una cadena a una variable de otro tipo en la línea",
                           linea[1])
                     return False
+    return True
 
 
 def asDeTabSim(linea, m):
@@ -315,7 +318,7 @@ def asDeVarTabSim(linea, m):
 
 
 # Analiíza que la línea sea sintacticamente correcta.
-def syntactic_analyzer(linea, tabsim):
+def syntactic_analyzer(linea, tabsim, iteracion):
     if not operacion_en_comparacion:
         cuadroplo.clear()
     # Recibe una lista con la línea y su numero de línea ['linea (string)', numero de linea (int)].
@@ -531,6 +534,8 @@ def syntactic_analyzer(linea, tabsim):
                             add.append(pilaIdentificadores[tope-1])
                         es_operacion = True
                         add.append('t' + str(len(cuadroplo)+1))
+                        if iteracion == 1:
+                            copy.copiarCuadroplo(add)
                         cuadroplo.append(add)
                         pilaIdentificadores[tope-2] = add[3]
                         pilaIdentificadores.pop()
@@ -540,7 +545,7 @@ def syntactic_analyzer(linea, tabsim):
                         tope -= 1
 
 
-def logic_analyzer(linea, tabsim):
+def logic_analyzer(linea, tabsim, iteracion):
     cuadroplo.clear()
     numero_linea = linea[1]
     instruccion = linea[0].split('{')
@@ -565,7 +570,7 @@ def logic_analyzer(linea, tabsim):
         operacion_en_comparacion = True
     for operacion in operaciones:
         op = [operacion, numero_linea]
-        if not syntactic_analyzer(op, tabsim):
+        if not syntactic_analyzer(op, tabsim, iteracion):
             return False
         else:
             add = []

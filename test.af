@@ -1,8 +1,9 @@
 int x = 10;
-int y;
+int y = 20;
 int z;
+int a;
 str cad = "Hola";
 imp(cad + "Mundo");
-leer(y);
-y = 20;
+#leer(y);
 z = x + y;
+imp(z);

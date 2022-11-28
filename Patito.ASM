@@ -10,8 +10,10 @@ datos segment para public 'data'
         x DB 10
         y DB 20
         z DB 30
+        a DB 0
         cad DB 6,?,6 dup(?)
         str1 DB "Mundo", 0
+        t1 DB ?
         ;Cadenas a imprimir.
 datos ends
 codigo  segment para public 'code'
@@ -30,8 +32,13 @@ p0      proc far
         call imprimir
         lea si, str1
         call imprimir
-        lea dx, y
-        call leer
+        mov AX, x
+        mov BX, y
+        add AX, BX
+        mov t1, AX
+        mov z, t1
+        lea si, z
+        call imprimir
         ;Codigo.
 
 
@@ -40,6 +47,8 @@ p0      endp
 
 codigo  ends
         end p0
+
+
 
 
 
