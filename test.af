@@ -1,8 +1,5 @@
 int x = 10;
 int y = 20;
-int z;
-int a;
 str pais;
 leer(pais);
-str cad = "Brasil ";
-imp(pais + " veces campeao do Mundo");
+imp(pais + x + " veces campeao do mundo");

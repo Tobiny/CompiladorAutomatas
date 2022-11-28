@@ -12,7 +12,7 @@ def copiar(archivo):
                 if linea == "datos segment para public 'data'":
                     for simb in Pl.tabsim:
                         if simb[1] == "int":
-                            txt.write("        " + simb[0] + " DB " + str(int(simb[2])) + "\n")
+                            txt.write("        " + simb[0] + " DW " + str(int(simb[2])) + "\n")
                         elif simb[1] == "str":
                             if len(simb[2]) == 0:
                                 txt.write(
@@ -55,14 +55,20 @@ def copiarImpresion(cadenas, todo, tabsim):
                                         output.write('        mov bl, '+simbolo[0]+'[1]\n')
                                         output.write('        mov '+simbolo[0]+'[bx+2], \'$\'\n')
                                         output.write('        mov dx, offset '+simbolo[0]+' + 2\n')
+                                        output.write('        mov ah, 9\n')
+                                        output.write('        int 21h\n')
                                     else:
+                                        contImpDec = 0
                                         if simbolo[1] == "int":
-                                            output.write("        ;Impresión decimal\n")
+                                            output.write("        mov AX, "+simbolo[0]+"\n")
+                                            output.write("        push AX\n")
+                                            output.write("        call todec\n")
+                                            output.write("        pop ax\n")
+
                                         elif simbolo[1] == "str":
                                             output.write('        mov dx, offset ' + elemento + '\n')
-
-                                    output.write('        mov ah, 9\n')
-                                    output.write('        int 21h\n')
+                                            output.write('        mov ah, 9\n')
+                                            output.write('        int 21h\n')
                                     output.write('\n')
                 output.write(linea + '\n') 
 
