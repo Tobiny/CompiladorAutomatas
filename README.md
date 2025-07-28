@@ -4,7 +4,7 @@ A modern web-based compiler for the Automata Language (.af) featuring a complete
 
 ## 🌐 Live Demo
 
-**Try it online:** [automata-compiler-api.onrender.com](https://automata-compiler-api.onrender.com) *(Replace with your actual Render URL)*
+**Try it online:** [https://simple-language-compiler.onrender.com/](https://simple-language-compiler.onrender.com/) 
 
 ## 🚀 Features
 
@@ -63,7 +63,7 @@ docker run -p 5000:5000 automata-compiler
 
 ### Base URL
 - **Local**: `http://localhost:5000`
-- **Production**: `https://your-app.onrender.com`
+- **Production**: `https://simple-language-compiler.onrender.com/`
 
 ### Endpoints
 
@@ -257,10 +257,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔗 Links
 
-- **Live Demo**: [automata-compiler-api.onrender.com](https://automata-compiler-api.onrender.com)
-- **Documentation**: [API Docs](https://automata-compiler-api.onrender.com/docs)
+- **Live Demo**: [simple-language-compiler.onrender.com](https://simple-language-compiler.onrender.com/)
 - **GitHub**: [Repository](https://github.com/your-username/automata-compiler-api)
-- **Portfolio**: [Your Portfolio Website](https://your-portfolio.com)
 
 ---
 
