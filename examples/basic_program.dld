@@ -1,0 +1,18 @@
+1: // Basic Duck Language Program
+2: // This demonstrates variable declarations, assignments, and I/O
+4: int x = 2;
+5: int y = 10;
+6: int result;
+7: int z;
+9: // Arithmetic operation
+10: z = y / x;
+12: // Print the result
+13: print(z);
+15: // Read user input
+16: read(z);
+18: // String interpolation and printing
+19: print("Serbia " + z + " times world champion");
+21: // Complex arithmetic expression
+22: result = z * 2 + (5 + 8 - 2);
+24: // Display final result
+25: print(result);

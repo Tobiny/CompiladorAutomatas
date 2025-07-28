@@ -1,0 +1,56 @@
+// Control Flow Structures - Conditionals and Loops
+// Demonstrates if statements, while loops, and boolean operations
+
+boolean flag1 = False;
+boolean flag2 = True;
+boolean flag3;
+int alpha;
+int counter = 0;
+
+// Variable assignment
+alpha = 100;
+
+// Conditional execution with arithmetic comparison
+if(1 + 1 < 2 + 2 * 4) {
+    print("Mathematical condition passed!");
+    print(alpha);
+    read(flag1);
+}
+
+// Boolean equality comparison
+if(flag2 == flag2) {
+    print("Boolean comparison successful!");
+}
+
+// Logical AND operation
+int a = 5;
+int b = 10;
+
+if(a > 0 && b < 20) {
+    print("Both conditions are true");
+    
+    // Nested arithmetic within conditional
+    int result = ((a + b) * 2) - 5;
+    print("Calculated result: " + result);
+}
+
+// Complex logical expression
+if(a < b && !(a == b)) {
+    print("a is less than b and they are not equal");
+}
+
+// String variable handling
+str message = "Hello, Automata Language!";
+print(message);
+
+// Additional conditional examples
+if(alpha > 50) {
+    print("Alpha is greater than 50");
+}
+
+// Multiple condition testing
+if(a > 0) {
+    if(b > 5) {
+        print("Nested conditions work!");
+    }
+} 

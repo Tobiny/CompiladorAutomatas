@@ -58,6 +58,10 @@ ENV/
 env.bak/
 venv.bak/
 
+# Flask specific
+instance/
+.webassets-cache
+
 # IDE specific files
 .vscode/
 .idea/
@@ -75,7 +79,7 @@ ehthumbs.db
 Thumbs.db
 
 # Compiler generated files
-*.dld
+*.afd
 *.asm
 *_tokens.csv
 *.afn
@@ -92,6 +96,7 @@ output.*
 
 # Logs
 *.log
+flask.log
 
 # Temporary files
 *.tmp
@@ -99,4 +104,8 @@ output.*
 
 # Backup files
 *.bak
-*.backup 
+*.backup
+
+# API specific files
+uploads/
+temp/ 

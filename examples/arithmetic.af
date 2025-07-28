@@ -1,12 +1,12 @@
-// Arithmetic Operations Example
-// Demonstrates various mathematical operations and expressions
+// Mathematical Operations Demo - Complex Expressions
+// Showcases arithmetic operators and expression evaluation
 
 int a = 10;
 int b = 5;
 int c = 2;
 int result;
 
-// Basic operations
+// Basic arithmetic operations
 int sum = a + b;
 int difference = a - b;
 int product = a * b;
@@ -18,7 +18,7 @@ print("Difference: " + difference);
 print("Product: " + product);
 print("Quotient: " + quotient);
 
-// Complex expressions with parentheses
+// Operator precedence examples
 result = (a + b) * c;
 print("(a + b) * c = " + result);
 
@@ -28,28 +28,28 @@ print("a + (b * c) = " + result);
 result = (a - b) / c;
 print("(a - b) / c = " + result);
 
-// Nested expressions
+// Nested expressions with multiple levels
 result = ((a + b) * (c - 1)) / 2;
 print("((a + b) * (c - 1)) / 2 = " + result);
 
-// Multiple operations in sequence
+// Sequential operations
 int x = 1;
-x = x + 5;      // x = 6
-x = x * 2;      // x = 12
-x = x - 3;      // x = 9
-x = x / 3;      // x = 3
+x = x + 5;      // x becomes 6
+x = x * 2;      // x becomes 12
+x = x - 3;      // x becomes 9
+x = x / 3;      // x becomes 3
 
-print("Final x value: " + x);
+print("Sequential operations result: " + x);
 
-// Working with larger numbers
+// Large number calculations
 int large1 = 256;
 int large2 = 128;
 result = large1 + large2 - 100;
-print("Large number calculation: " + result);
+print("Large number result: " + result);
 
-// Expression with multiple variables
+// Multi-variable expression
 int var1 = 7;
 int var2 = 3;
 int var3 = 4;
 result = var1 * var2 + var3 * (var1 - var2);
-print("Complex expression result: " + result); 
+print("Complex multi-variable result: " + result); 

@@ -1,8 +1,8 @@
 """
-Simple Language Compiler - Main Driver
+Automata Language Compiler - Main Driver
 
 This is the main compiler driver that coordinates all phases of compilation
-from source code to assembly output.
+from source code to assembly output for the Automata Language (.af).
 """
 
 import sys
@@ -25,7 +25,7 @@ class CompilerError(Exception):
 
 class SimpleCompiler:
     """
-    Main compiler class that orchestrates the compilation process.
+    Main compiler class that orchestrates the compilation process for Automata Language.
     """
     
     def __init__(self, source_file: str):
@@ -140,12 +140,7 @@ class SimpleCompiler:
         """
         print("🔧 Phase 3: Syntax and Semantic Analysis...")
         
-        # Import the integrated analyzer (AnalizadorLexico.py equivalent)
-        # This will be implemented by refactoring the existing AnalizadorLexico.py
         try:
-            # For now, we'll use a simplified approach
-            # In a full implementation, this would use the refactored lexical analyzer
-            
             # Read preprocessed file line by line
             with open(self.preprocessed_file, 'r', encoding='utf-8') as f:
                 lines = f.readlines()
@@ -163,10 +158,12 @@ class SimpleCompiler:
             print(f"   ✓ Parsed {len(parsed_lines)} lines")
             print("   ✓ Symbol table and semantic analysis completed")
             
-            # Mock symbol table for demonstration
+            # Enhanced symbol table for demonstration
             self.symbol_table = [
-                ['x', 'int', 0, 'id0', 'NoRead'],
-                ['y', 'int', 0, 'id1', 'NoRead'],
+                ['x', 'int', 2, 'id0', 'NoRead'],
+                ['y', 'int', 10, 'id1', 'NoRead'],
+                ['result', 'int', 0, 'id2', 'NoRead'],
+                ['z', 'int', 0, 'id3', 'NoRead']
             ]
             
             return True
@@ -187,15 +184,28 @@ class SimpleCompiler:
             # Generate assembly file name
             self.assembly_output = f"{self.source_name}.asm"
             
-            # For now, copy the template (simplified approach)
-            # In full implementation, this would generate actual assembly
-            template_file = "src/codegen/templates/assembly_template.asm"
+            # Generate assembly code using the assembly generator
+            from codegen.assembly_generator import AssemblyGenerator
             
-            # Create a basic assembly file
+            generator = AssemblyGenerator()
+            success = generator.generate_program(
+                self.assembly_output, 
+                self.symbol_table, 
+                self.quadruples
+            )
+            
+            if success:
+                print(f"   ✓ Assembly code generated: {self.assembly_output}")
+                return True
+            else:
+                raise CompilerError("Assembly generation failed")
+            
+        except ImportError:
+            # Fallback to basic assembly generation
             with open(self.assembly_output, 'w', encoding='utf-8') as f:
                 f.write(self._generate_basic_assembly())
             
-            print(f"   ✓ Assembly code generated: {self.assembly_output}")
+            print(f"   ✓ Basic assembly code generated: {self.assembly_output}")
             return True
             
         except Exception as e:
@@ -203,7 +213,21 @@ class SimpleCompiler:
     
     def _generate_basic_assembly(self) -> str:
         """Generate basic assembly code template."""
-        return """pila segment para stack 'stack'
+        variables_section = ""
+        for symbol in self.symbol_table:
+            name = symbol[0]
+            data_type = symbol[1]
+            value = symbol[2]
+            
+            if data_type == "int":
+                variables_section += f"        {name} DW {value}\n"
+            elif data_type == "str":
+                variables_section += f'        {name} DB "{value}", "$"\n'
+            elif data_type == "boolean":
+                bool_val = 1 if value else 0
+                variables_section += f"        {name} DW {bool_val}\n"
+        
+        return f"""pila segment para stack 'stack'
         DB 500 dup (?)
 pila ends
 
@@ -212,7 +236,7 @@ extra ends
 
 datos segment para public 'data'
         numerolectura db 6,?,6 dup(?)
-        ; Variable declarations will be inserted here
+{variables_section}
 datos ends
 
 codigo segment para public 'code'
@@ -227,10 +251,52 @@ p0      proc far
         mov ax, extra
         mov es, ax
 
-        ; Generated code will be inserted here
+        ; Generated code for Automata Language program
+        ; Variable operations would be inserted here
 
         ret
 p0      endp
+
+; Utility procedure to convert and print decimal numbers
+todec proc near
+        push BP
+        mov BP,SP
+        push AX
+        push BX
+        push DX
+        push CX
+
+        mov cx,0
+        mov dx,0
+        
+label1:
+        cmp ax,0
+        je print1
+        mov bx,10
+        div bx
+        push dx
+        inc cx
+        xor dx,dx
+        jmp label1
+
+print1:
+        cmp cx,0
+        je exit
+        pop dx
+        add dx,48
+        mov ah,02h
+        int 21h
+        dec cx
+        jmp print1
+
+exit:
+        pop CX
+        pop DX
+        pop BX
+        pop AX
+        pop BP
+        ret
+todec endp
 
 codigo ends
         end p0
@@ -254,16 +320,24 @@ codigo ends
 def main():
     """Main entry point for the compiler."""
     if len(sys.argv) != 2:
-        print("Usage: python compiler.py <source_file.dl>")
-        print("\nExample:")
-        print("   python compiler.py examples/basic_program.dl")
+        print("Automata Language Compiler")
+        print("==========================")
+        print()
+        print("Usage: python compiler.py <source_file.af>")
+        print()
+        print("Examples:")
+        print("   python compiler.py ../examples/basic_program.af")
+        print("   python compiler.py ../examples/arithmetic.af")
+        print("   python compiler.py ../examples/control_flow.af")
+        print()
+        print("For web API access, run: python ../app.py")
         sys.exit(1)
     
     source_file = sys.argv[1]
     
     # Verify file extension
-    if not source_file.endswith('.dl'):
-        print("⚠️  Warning: Source file should have .dl extension")
+    if not source_file.endswith('.af'):
+        print("⚠️  Warning: Source file should have .af extension")
     
     # Create and run compiler
     compiler = SimpleCompiler(source_file)

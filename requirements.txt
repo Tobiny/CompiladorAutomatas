@@ -1,24 +1,16 @@
-# Simple Language Compiler Dependencies
-# Python 3.7+ required
+# Automata Compiler API - Production Dependencies
+# Python 3.9+ required
 
-# Standard library modules used:
-# - re (regex operations)
-# - os (file operations)
-# - sys (system operations)
-# - pathlib (path handling)
-# - typing (type hints)
-# - dataclasses (data structures)
-# - enum (enumerations)
+# Web framework
+flask
+flask-cors
 
-# Optional dependencies for development and testing:
-pytest>=6.0.0
-pytest-cov>=2.12.0
+# Optional dependencies for development
+pytest
+pytest-cov
+black
+flake8
+mypy
 
-# Code quality tools
-black>=21.0.0
-flake8>=3.9.0
-mypy>=0.910
-
-# Documentation (optional)
-sphinx>=4.0.0
-sphinx-rtd-theme>=0.5.0 
+# Production server
+gunicorn 

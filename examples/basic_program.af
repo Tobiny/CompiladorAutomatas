@@ -1,0 +1,25 @@
+// Basic Automata Program - Variables and I/O Operations
+// Demonstrates variable declarations, arithmetic, and input/output
+
+int x = 2;
+int y = 10;
+int result;
+int z;
+
+// Division operation
+z = y / x;
+
+// Output the result
+print(z);
+
+// Read user input
+read(z);
+
+// String concatenation with variables
+print("Serbia " + z + " times world champion");
+
+// Complex arithmetic expression with parentheses
+result = z * 2 + (5 + 8 - 2);
+
+// Display final calculation
+print(result); 

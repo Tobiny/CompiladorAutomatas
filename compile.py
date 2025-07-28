@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Simple Language Compiler - Convenience Script
+Automata Compiler - Convenience Script
 
 This script provides a convenient way to run the compiler from the project root.
 It automatically handles path resolution and provides better error messages.
@@ -19,20 +19,22 @@ from src.compiler import main
 if __name__ == "__main__":
     # Update help message for project root usage
     if len(sys.argv) != 2:
-        print("Simple Language Compiler")
-        print("========================")
+        print("Automata Language Compiler")
+        print("=========================")
         print()
-        print("Usage: python compile.py <source_file.dl>")
+        print("Usage: python compile.py <source_file.af>")
         print()
         print("Examples:")
-        print("   python compile.py examples/basic_program.dl")
-        print("   python compile.py examples/arithmetic.dl") 
-        print("   python compile.py examples/control_flow.dl")
+        print("   python compile.py examples/basic_program.af")
+        print("   python compile.py examples/arithmetic.af") 
+        print("   python compile.py examples/control_flow.af")
         print()
         print("The compiler will generate:")
-        print("   - <filename>.dld  (preprocessed source)")
+        print("   - <filename>.afd  (preprocessed source)")
         print("   - <filename>_tokens.csv  (lexical analysis)")
         print("   - <filename>.asm  (assembly output)")
+        print()
+        print("For web API access, run: python app.py")
         sys.exit(1)
     
     # Verify file exists
@@ -40,6 +42,10 @@ if __name__ == "__main__":
     if not os.path.exists(source_file):
         print(f"❌ Error: Source file '{source_file}' not found")
         sys.exit(1)
+    
+    # Verify file extension
+    if not source_file.endswith('.af'):
+        print("⚠️  Warning: Source file should have .af extension")
     
     # Run the compiler
     main() 
