@@ -1,0 +1,55 @@
+// Arithmetic Operations Example
+// Demonstrates various mathematical operations and expressions
+
+int a = 10;
+int b = 5;
+int c = 2;
+int result;
+
+// Basic operations
+int sum = a + b;
+int difference = a - b;
+int product = a * b;
+int quotient = a / b;
+
+print("Basic Operations:");
+print("Sum: " + sum);
+print("Difference: " + difference);
+print("Product: " + product);
+print("Quotient: " + quotient);
+
+// Complex expressions with parentheses
+result = (a + b) * c;
+print("(a + b) * c = " + result);
+
+result = a + (b * c);
+print("a + (b * c) = " + result);
+
+result = (a - b) / c;
+print("(a - b) / c = " + result);
+
+// Nested expressions
+result = ((a + b) * (c - 1)) / 2;
+print("((a + b) * (c - 1)) / 2 = " + result);
+
+// Multiple operations in sequence
+int x = 1;
+x = x + 5;      // x = 6
+x = x * 2;      // x = 12
+x = x - 3;      // x = 9
+x = x / 3;      // x = 3
+
+print("Final x value: " + x);
+
+// Working with larger numbers
+int large1 = 256;
+int large2 = 128;
+result = large1 + large2 - 100;
+print("Large number calculation: " + result);
+
+// Expression with multiple variables
+int var1 = 7;
+int var2 = 3;
+int var3 = 4;
+result = var1 * var2 + var3 * (var1 - var2);
+print("Complex expression result: " + result); 
